@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ITS Xalapa - Sistema de Kardex</title>
-    <!-- Firebase SDKs (versión compat para CDN) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -24,7 +24,6 @@
             --texto-claro: #64748b;
             --borde: #e2e8f0;
             --primario: #1e3c72;
-            --primario-light: #2c5282;
             --verde: #10b981;
             --naranja: #f59e0b;
             --rojo: #ef4444;
@@ -70,13 +69,34 @@
             background: #1e293b;
         }
 
-        .login-logo {
-            font-size: 3rem;
-            margin-bottom: 8px;
+        /* Logo del TecNM */
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .logo-tecnm {
+            max-width: 180px;
+            margin: 0 auto;
+        }
+
+        .logo-tecnm svg {
+            width: 100%;
+            height: auto;
+        }
+
+        .logo-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        body.dark .logo-text {
+            color: #94a3b8;
         }
 
         .login-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #1e3c72;
             margin-bottom: 4px;
@@ -87,9 +107,9 @@
         }
 
         .login-subtitle {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #64748b;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .login-input {
@@ -119,6 +139,12 @@
             font-weight: 600;
             cursor: pointer;
             margin-bottom: 12px;
+            transition: opacity 0.2s;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .login-btn-secondary {
@@ -133,9 +159,19 @@
         }
 
         .login-footer {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #94a3b8;
             margin-top: 24px;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-bottom: 16px;
+            text-align: left;
         }
 
         /* App principal */
@@ -459,7 +495,7 @@
             border-radius: 40px;
             font-size: 0.75rem;
             z-index: 300;
-            animation: fadeOut 2s forwards;
+            animation: fadeOut 2.5s forwards;
         }
 
         @keyframes fadeOut {
@@ -486,9 +522,20 @@
 <!-- Pantalla de Login -->
 <div id="loginContainer" class="login-container">
     <div class="login-card">
-        <div class="login-logo">🏫</div>
-        <div class="login-title">Instituto Tecnológico Superior de Xalapa</div>
-        <div class="login-subtitle">Sistema de Kardex</div>
+        <!-- Logo del TecNM -->
+        <div class="logo-container">
+            <div class="logo-tecnm">
+                <img src="https://raw.githubusercontent.com/jousueperea-432bc/kardex/main/tecmm_logo.png" 
+                     alt="Tecnológico Nacional de México"
+                     style="max-width: 180px; width: 100%; height: auto; margin: 0 auto; display: block;"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'font-size:1rem;font-weight:bold;text-align:center;\'>TECNOLÓGICO<br>NACIONAL DE MÉXICO</div>'">
+            </div>
+        </div>
+        
+        <div class="login-title">Sistema de Kardex</div>
+        <div class="login-subtitle">Control académico</div>
+        
+        <div id="loginError" class="error-message" style="display: none;"></div>
         
         <input type="text" id="loginMatricula" class="login-input" placeholder="Número de control" autocomplete="off">
         <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
@@ -670,6 +717,13 @@
 
     // ==================== FUNCIONES DE AUTENTICACIÓN ====================
     async function registrarUsuario(matricula, password) {
+        const loginBtn = document.getElementById('registerBtn');
+        const errorDiv = document.getElementById('loginError');
+        
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="loading-spinner"></span> Registrando...';
+        errorDiv.style.display = 'none';
+        
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
@@ -689,18 +743,53 @@
             mostrarToast('✅ Usuario registrado exitosamente');
             await cargarApp();
         } catch (error) {
-            mostrarToast('❌ Error: ' + error.message);
+            errorDiv.style.display = 'block';
+            let mensaje = error.message;
+            if (error.code === 'auth/email-already-in-use') {
+                mensaje = '❌ Esta matrícula ya está registrada. Intenta iniciar sesión.';
+            } else if (error.code === 'auth/weak-password') {
+                mensaje = '❌ La contraseña debe tener al menos 6 caracteres.';
+            } else if (error.code === 'auth/operation-not-allowed') {
+                mensaje = '❌ Error de configuración. Contacta al administrador. (Auth no habilitado)';
+            }
+            errorDiv.innerHTML = mensaje;
+            mostrarToast(mensaje);
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Registrarse';
         }
     }
 
     async function iniciarSesion(matricula, password) {
+        const loginBtn = document.getElementById('loginBtn');
+        const errorDiv = document.getElementById('loginError');
+        
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="loading-spinner"></span> Iniciando...';
+        errorDiv.style.display = 'none';
+        
         try {
             const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
             mostrarToast('👋 Bienvenido ' + matricula);
             await cargarApp();
         } catch (error) {
-            mostrarToast('❌ Error: ' + error.message);
+            errorDiv.style.display = 'block';
+            let mensaje = error.message;
+            if (error.code === 'auth/user-not-found') {
+                mensaje = '❌ Usuario no encontrado. Regístrate primero.';
+            } else if (error.code === 'auth/wrong-password') {
+                mensaje = '❌ Contraseña incorrecta. Intenta de nuevo.';
+            } else if (error.code === 'auth/invalid-email') {
+                mensaje = '❌ Matrícula inválida.';
+            } else if (error.code === 'auth/operation-not-allowed') {
+                mensaje = '❌ Error de configuración. Contacta al administrador.';
+            }
+            errorDiv.innerHTML = mensaje;
+            mostrarToast(mensaje);
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Iniciar sesión';
         }
     }
 
@@ -711,6 +800,7 @@
         document.getElementById('appContainer').style.display = 'none';
         document.getElementById('loginMatricula').value = '';
         document.getElementById('loginPassword').value = '';
+        document.getElementById('loginError').style.display = 'none';
     }
 
     // ==================== CARGAR DATOS DESDE FIRESTORE ====================

@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ITS Xalapa - Kardex</title>
+    <title>ITS Xalapa - Sistema de Kardex Multicarreras</title>
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Normalize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Chart.js para gráficas -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <!-- Firebase -->
@@ -23,107 +26,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Animaciones personalizadas */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        :root {
+            --primary: #1e3c72;
+            --primary-dark: #2c5282;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .transition-smooth {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .animate-fadeInUp {
-            animation: fadeInUp 0.5s ease-out;
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
         }
         
-        .animate-slideIn {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .hover-pulse:hover {
-            animation: pulse 0.3s ease-in-out;
-        }
-        
-        /* Transiciones suaves */
-        .transition-all-slow {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #1e3c72;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #2c5282;
-        }
-        
-        /* Modo oscuro personalizado con Tailwind */
         .dark {
             background-color: #0f172a;
             color: #f1f5f9;
         }
         
-        .dark .bg-white {
-            background-color: #1e293b !important;
+        .dark .bg-white { background-color: #1e293b !important; }
+        .dark .bg-gray-50 { background-color: #0f172a !important; }
+        .dark .text-gray-600 { color: #94a3b8 !important; }
+        .dark .border-gray-200 { border-color: #334155 !important; }
+        
+        .chart-container {
+            max-width: 280px;
+            margin: 0 auto;
         }
         
-        .dark .text-gray-600 {
-            color: #94a3b8 !important;
+        /* Selector de carrera estilizado */
+        .carrera-selector {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .dark .border-gray-200 {
-            border-color: #334155 !important;
+        .carrera-option {
+            transition: all 0.2s;
         }
         
-        .dark .bg-gray-50 {
-            background-color: #0f172a !important;
-        }
-        
-        .dark .bg-gray-100 {
-            background-color: #1e293b !important;
+        .carrera-option:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-all-slow">
+<body class="bg-gray-50 transition-smooth">
 
 <!-- Pantalla de Login -->
 <div id="loginContainer" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full animate-fadeInUp">
-        <!-- Logo -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full animate-fadeIn">
         <div class="text-center mb-6">
-            <div class="w-32 h-32 mx-auto bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center shadow-lg">
-                <i class="fas fa-graduation-cap text-5xl text-white"></i>
+            <div class="w-24 h-24 mx-auto bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-graduation-cap text-4xl text-white"></i>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 dark:text-white mt-4">TecNM</h2>
             <p class="text-gray-500 dark:text-gray-400 text-sm">Instituto Tecnológico Superior de Xalapa</p>
@@ -137,10 +97,10 @@
         <input type="text" id="loginMatricula" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4" placeholder="Número de control">
         <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4" placeholder="Contraseña">
         
-        <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all-slow hover:shadow-lg">
+        <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-smooth">
             <i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión
         </button>
-        <button id="registerBtn" class="w-full mt-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 font-semibold py-3 rounded-lg transition-all-slow">
+        <button id="registerBtn" class="w-full mt-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 font-semibold py-3 rounded-lg transition-smooth">
             <i class="fas fa-user-plus mr-2"></i> Registrarse
         </button>
         
@@ -162,87 +122,139 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400" id="userInfoDisplay">Cargando...</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all-slow">
+            <div class="flex items-center space-x-2">
+                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-smooth">
                     <i class="fas fa-moon text-gray-600 dark:text-gray-300 text-xl"></i>
                 </button>
-                <button id="logoutBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <button id="logoutBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-smooth">
                     <i class="fas fa-sign-out-alt text-gray-600 dark:text-gray-300 text-xl"></i>
                 </button>
             </div>
         </div>
     </header>
     
+    <!-- Selector de Carrera (visible solo después de login) -->
+    <div class="carrera-selector bg-gradient-to-r from-blue-600 to-purple-600 shadow-md">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-2 text-white">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span class="text-sm font-medium">Mi carrera:</span>
+                </div>
+                <select id="carreraSelector" class="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-medium border-0 focus:ring-2 focus:ring-white text-sm">
+                    <option value="sistemas">🔧 INGENIERÍA EN SISTEMAS COMPUTACIONALES</option>
+                    <option value="electromecanica">⚙️ INGENIERÍA EN ELECTROMECÁNICA</option>
+                    <option value="electronica">📡 INGENIERÍA ELECTRÓNICA</option>
+                    <option value="mecatronica">🤖 INGENIERÍA EN MECATRÓNICA</option>
+                    <option value="bioquimica">🧬 INGENIERÍA BIOQUÍMICA</option>
+                    <option value="gestion">📊 INGENIERÍA EN GESTIÓN EMPRESARIAL</option>
+                    <option value="industrial">🏭 INGENIERÍA INDUSTRIAL</option>
+                    <option value="alimentarias">🍎 INGENIERÍA EN ALIMENTARIAS</option>
+                    <option value="gastronomia">🍳 GASTRONOMÍA</option>
+                </select>
+                <div class="text-white text-xs" id="carreraCreditosInfo">0 créditos totales</div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Tabs -->
     <div class="bg-white dark:bg-gray-800 shadow-sm sticky top-[73px] z-40">
         <div class="container mx-auto px-4">
             <div class="flex space-x-1 overflow-x-auto">
-                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="inicio">
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-smooth" data-tab="inicio">
                     <i class="fas fa-chart-line mr-2"></i> Inicio
                 </button>
-                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="materias">
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-smooth" data-tab="materias">
                     <i class="fas fa-book mr-2"></i> Materias
                 </button>
-                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="perfil">
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-smooth" data-tab="estadisticas">
+                    <i class="fas fa-chart-simple mr-2"></i> Estadísticas
+                </button>
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-smooth" data-tab="perfil">
                     <i class="fas fa-user mr-2"></i> Perfil
                 </button>
-                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="respaldo">
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-smooth" data-tab="respaldo">
                     <i class="fas fa-database mr-2"></i> Respaldo
                 </button>
             </div>
         </div>
     </div>
     
-    <!-- Contenido -->
+    <!-- Contenido principal -->
     <div class="container mx-auto px-4 py-6 max-w-6xl">
+        
         <!-- Pestaña Inicio -->
         <div class="tab-content hidden" id="tab-inicio">
-            <!-- Stats Cards -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6" id="statsContainer"></div>
             
-            <!-- Gráfica de avance -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
-                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
-                    <i class="fas fa-chart-line text-blue-600 mr-2"></i> Progreso académico
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 text-center text-sm">
+                    <i class="fas fa-chart-pie text-blue-600 mr-2"></i> Distribución de créditos
                 </h3>
-                <canvas id="avanceChart" width="400" height="200" class="w-full h-64"></canvas>
+                <div class="chart-container">
+                    <canvas id="avanceChart" width="280" height="180" style="max-height: 180px;"></canvas>
+                </div>
             </div>
             
-            <!-- OCR Upload -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
                     <i class="fas fa-camera mr-2 text-blue-600"></i> Sube tu kardex
                 </h3>
-                <div id="ocrUploadArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 transition-all-slow">
-                    <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-3"></i>
-                    <p class="text-gray-500 dark:text-gray-400">Toca o arrastra una imagen aquí</p>
+                <div id="ocrUploadArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500 transition-smooth">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Toca o arrastra una imagen aquí</p>
                     <input type="file" id="imagenKardex" accept="image/*" class="hidden">
                 </div>
                 <div id="previewImagen" class="mt-4 hidden">
-                    <img id="previewImg" class="rounded-xl max-h-48 mx-auto">
+                    <img id="previewImg" class="rounded-xl max-h-40 mx-auto">
                 </div>
                 <div id="ocrStatus" class="mt-4 hidden"></div>
-                <button id="analizarOCRBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                <button id="analizarOCRBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-smooth">
                     <i class="fas fa-search mr-2"></i> Analizar imagen
                 </button>
             </div>
             
-            <!-- Avance reticular -->
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-md p-6 text-white">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-md p-5 text-white">
                 <div class="flex justify-between items-center mb-2">
                     <span class="font-semibold"><i class="fas fa-chart-simple mr-2"></i> Avance reticular</span>
                     <span class="text-2xl font-bold" id="avancePorcentaje">0%</span>
                 </div>
-                <div class="w-full bg-white/30 rounded-full h-3 mb-3">
-                    <div class="bg-white h-3 rounded-full transition-all duration-500" id="progressFill" style="width: 0%"></div>
+                <div class="w-full bg-white/30 rounded-full h-2 mb-2">
+                    <div class="bg-white h-2 rounded-full transition-all duration-500" id="progressFill" style="width: 0%"></div>
                 </div>
-                <p class="text-sm opacity-90" id="avanceDetalle">0/260 créditos acumulados</p>
+                <div class="flex justify-between text-xs opacity-90">
+                    <span id="avanceDetalle">0/0 créditos</span>
+                    <span id="promedioDisplay">Promedio: 0</span>
+                </div>
             </div>
         </div>
         
         <!-- Pestaña Materias -->
         <div class="tab-content hidden" id="tab-materias">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-4">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="buscadorMaterias" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Buscar materia por nombre o código...">
+                </div>
+            </div>
             <div id="semestresContainer"></div>
+        </div>
+        
+        <!-- Pestaña Estadísticas -->
+        <div class="tab-content hidden" id="tab-estadisticas">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-4">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-chart-line text-blue-600 mr-2"></i> Rendimiento por semestre
+                </h3>
+                <div id="statsPorSemestre" class="space-y-3"></div>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-trophy text-yellow-500 mr-2"></i> Logros académicos
+                </h3>
+                <div id="logrosContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            </div>
         </div>
         
         <!-- Pestaña Perfil -->
@@ -254,7 +266,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Universidad</label>
-                        <input type="text" id="universidadInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Instituto Tecnológico Superior de Xalapa">
+                        <input type="text" id="universidadInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" value="Instituto Tecnológico Superior de Xalapa">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de control</label>
@@ -265,14 +277,6 @@
                         <input type="text" id="nombreAlumno" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Carrera</label>
-                        <select id="carreraSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option>INGENIERÍA EN SISTEMAS COMPUTACIONALES</option>
-                            <option>INGENIERÍA INFORMÁTICA</option>
-                            <option>INGENIERÍA EN SOFTWARE</option>
-                        </select>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Especialidad</label>
                         <input type="text" id="especialidadInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: CÓMPUTO EN LA NUBE">
                     </div>
@@ -280,7 +284,7 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semestre actual</label>
                         <input type="number" id="semestreActual" min="1" max="9" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button id="guardarPerfilBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all-slow">
+                    <button id="guardarPerfilBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-smooth">
                         <i class="fas fa-save mr-2"></i> Guardar cambios
                     </button>
                 </div>
@@ -293,7 +297,7 @@
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
                     <i class="fas fa-download mr-2 text-green-600"></i> Exportar datos
                 </h3>
-                <button id="exportarKardexBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                <button id="exportarKardexBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-smooth">
                     <i class="fas fa-file-export mr-2"></i> Descargar respaldo (.json)
                 </button>
             </div>
@@ -303,7 +307,7 @@
                     <i class="fas fa-upload mr-2 text-orange-600"></i> Importar datos
                 </h3>
                 <input type="file" id="importarArchivo" accept=".json" class="w-full mb-3">
-                <button id="importarKardexBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                <button id="importarKardexBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-lg transition-smooth">
                     <i class="fas fa-file-import mr-2"></i> Cargar respaldo
                 </button>
             </div>
@@ -312,7 +316,7 @@
                 <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
                     <i class="fas fa-trash mr-2 text-red-600"></i> Zona de peligro
                 </h3>
-                <button id="eliminarDatosBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                <button id="eliminarDatosBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-smooth">
                     <i class="fas fa-exclamation-triangle mr-2"></i> Eliminar todos mis datos
                 </button>
             </div>
@@ -321,7 +325,172 @@
 </div>
 
 <script>
-    // Firebase Config
+    // ==================== BASE DE DATOS DE CARRERAS ====================
+    const carrerasDB = {
+        "sistemas": {
+            nombre: "INGENIERÍA EN SISTEMAS COMPUTACIONALES",
+            icono: "🔧",
+            totalCreditos: 260,
+            semestres: 9,
+            creditosPorSemestre: [32, 30, 33, 32, 31, 29, 34, 29, 10],
+            materias: [
+                { sem:1, cod:"ACF0903", nom:"ÁLGEBRA LINEAL", cred:5 }, { sem:1, cod:"ACF0901", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:1, cod:"AEC1008", nom:"CONTABILIDAD FINANCIERA", cred:4 }, { sem:1, cod:"SCD1008", nom:"FUNDAMENTOS DE PROGRAMACIÓN", cred:5 },
+                { sem:1, cod:"AEF1041", nom:"MATEMÁTICAS DISCRETAS", cred:5 }, { sem:1, cod:"AEF1052", nom:"PROBABILIDAD Y ESTADÍSTICA", cred:5 },
+                { sem:1, cod:"SCH1024", nom:"TALLER DE ADMINISTRACIÓN", cred:4 }, { sem:2, cod:"ACF0902", nom:"CÁLCULO INTEGRAL", cred:5 },
+                { sem:2, cod:"ACD0908", nom:"DESARROLLO SUSTENTABLE", cred:5 }, { sem:2, cod:"SCF1006", nom:"FÍSICA GENERAL", cred:5 },
+                { sem:2, cod:"SCC1013", nom:"INVESTIGACIÓN DE OPERACIONES", cred:4 }, { sem:2, cod:"SCD1020", nom:"PROGRAMACIÓN ORIENTADA A OBJETOS", cred:5 },
+                { sem:2, cod:"AEC1058", nom:"QUÍMICA", cred:4 }, { sem:2, cod:"ACA0907", nom:"TALLER DE ÉTICA", cred:4 },
+                { sem:3, cod:"ACF0904", nom:"CÁLCULO VECTORIAL", cred:5 }, { sem:3, cod:"ACF0905", nom:"ECUACIONES DIFERENCIALES", cred:5 },
+                { sem:3, cod:"AED1026", nom:"ESTRUCTURA DE DATOS", cred:5 }, { sem:3, cod:"SCC1017", nom:"MÉTODOS NUMÉRICOS", cred:4 },
+                { sem:3, cod:"SCD1018", nom:"PRINCIPIOS ELÉCTRICOS", cred:5 }, { sem:3, cod:"SCD1022", nom:"SIMULACIÓN", cred:5 },
+                { sem:3, cod:"AEC1061", nom:"SISTEMAS OPERATIVOS", cred:4 }, { sem:4, cod:"SCC1003", nom:"ARQUITECTURA DE COMPUTADORAS", cred:5 },
+                { sem:4, cod:"AEF1031", nom:"FUNDAMENTOS DE BASE DE DATOS", cred:5 }, { sem:4, cod:"SCC1007", nom:"FUNDAMENTOS DE INGENIERÍA DE SOFTWARE", cred:4 },
+                { sem:4, cod:"AEC1034", nom:"FUNDAMENTOS DE TELECOMUNICACIONES", cred:4 }, { sem:4, cod:"SCD1015", nom:"LENGUAJES Y AUTÓMATAS I", cred:5 },
+                { sem:4, cod:"SCA1026", nom:"TALLER DE SISTEMAS OPERATIVOS", cred:4 }, { sem:4, cod:"SCD1027", nom:"TÓPICOS AVANZADOS DE PROGRAMACIÓN", cred:5 },
+                { sem:5, cod:"ACC0906", nom:"FUNDAMENTOS DE INVESTIGACIÓN", cred:4 }, { sem:5, cod:"SCC1010", nom:"GRÁFICACIÓN", cred:4 },
+                { sem:5, cod:"SCD1011", nom:"INGENIERÍA DE SOFTWARE", cred:5 }, { sem:5, cod:"SCC1012", nom:"INTELIGENCIA ARTIFICIAL", cred:4 },
+                { sem:5, cod:"SCD1016", nom:"LENGUAJES Y AUTÓMATAS II", cred:5 }, { sem:5, cod:"SCD1021", nom:"REDES DE COMPUTADORA", cred:5 },
+                { sem:5, cod:"SCA1025", nom:"TALLER DE BASE DE DATOS", cred:4 }, { sem:6, cod:"SCB1001", nom:"ADMINISTRACIÓN DE BASE DE DATOS", cred:5 },
+                { sem:6, cod:"SCC1005", nom:"CULTURA EMPRESARIAL", cred:4 }, { sem:6, cod:"SCC1014", nom:"LENGUAJES DE INTERFAZ", cred:4 },
+                { sem:6, cod:"SCC1019", nom:"PROGRAMACIÓN LÓGICA Y FUNCIONAL", cred:4 }, { sem:6, cod:"SCD1023", nom:"SISTEMAS PROGRAMABLES", cred:4 },
+                { sem:6, cod:"ACA0909", nom:"TALLER DE INVESTIGACIÓN I", cred:4 }, { sem:7, cod:"SCB1004", nom:"CONMUTACIÓN Y ENRUTAMIENTO", cred:5 },
+                { sem:7, cod:"SCC1001", nom:"SERVICIO SOCIAL", cred:10 }, { sem:7, cod:"AEB1055", nom:"PROGRAMACIÓN WEB", cred:5 },
+                { sem:7, cod:"ACA0910", nom:"TALLER DE INVESTIGACIÓN II", cred:4 }, { sem:7, cod:"SCG1009", nom:"GESTIÓN DE PROYECTOS", cred:6 },
+                { sem:8, cod:"SCA1002", nom:"ADMINISTRACIÓN DE REDES", cred:4 }, { sem:8, cod:"CNM-2404", nom:"ADMINISTRACIÓN DE CÓMPUTO EN LA NUBE", cred:6 },
+                { sem:8, cod:"CNG-2403", nom:"HERRAMIENTAS DE SOFTWARE EN LA NUBE", cred:7 }, { sem:8, cod:"CNG-2402", nom:"ARQUITECTURA DE SOLUCIONES EN LA NUBE", cred:6 },
+                { sem:8, cod:"CNG-2401", nom:"FUNDAMENTOS DE CÓMPUTO EN LA NUBE", cred:6 }, { sem:9, cod:"RPC1001", nom:"RESIDENCIA PROFESIONAL", cred:10 }
+            ]
+        },
+        "electromecanica": {
+            nombre: "INGENIERÍA EN ELECTROMECÁNICA",
+            icono: "⚙️",
+            totalCreditos: 250,
+            semestres: 9,
+            creditosPorSemestre: [30, 28, 32, 30, 28, 28, 30, 28, 16],
+            materias: [
+                { sem:1, cod:"EME101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"EME102", nom:"DIBUJO TÉCNICO", cred:4 },
+                { sem:1, cod:"EME103", nom:"FÍSICA GENERAL", cred:5 }, { sem:1, cod:"EME104", nom:"QUÍMICA BÁSICA", cred:4 },
+                { sem:1, cod:"EME105", nom:"TALLER DE MECÁNICA", cred:5 }, { sem:1, cod:"EME106", nom:"ELECTRICIDAD BÁSICA", cred:4 },
+                { sem:1, cod:"EME107", nom:"ÉTICA PROFESIONAL", cred:3 }, { sem:2, cod:"EME201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"EME202", nom:"ESTÁTICA", cred:5 }, { sem:2, cod:"EME203", nom:"TERMODINÁMICA", cred:5 },
+                { sem:2, cod:"EME204", nom:"CIRCUITOS ELÉCTRICOS", cred:5 }, { sem:2, cod:"EME205", nom:"DIBUJO ASISTIDO", cred:4 },
+                { sem:2, cod:"EME206", nom:"METROLOGÍA", cred:4 }
+            ]
+        },
+        "electronica": {
+            nombre: "INGENIERÍA ELECTRÓNICA",
+            icono: "📡",
+            totalCreditos: 255,
+            semestres: 9,
+            creditosPorSemestre: [30, 28, 32, 30, 29, 28, 30, 28, 20],
+            materias: [
+                { sem:1, cod:"ELE101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"ELE102", nom:"FÍSICA GENERAL", cred:5 },
+                { sem:1, cod:"ELE103", nom:"QUÍMICA", cred:4 }, { sem:1, cod:"ELE104", nom:"INTRODUCCIÓN A LA ELECTRÓNICA", cred:4 },
+                { sem:1, cod:"ELE105", nom:"DIBUJO TÉCNICO", cred:4 }, { sem:1, cod:"ELE106", nom:"PROGRAMACIÓN BÁSICA", cred:4 },
+                { sem:1, cod:"ELE107", nom:"ÉTICA", cred:4 }, { sem:2, cod:"ELE201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"ELE202", nom:"ÁLGEBRA LINEAL", cred:5 }, { sem:2, cod:"ELE203", nom:"CIRCUITOS ELÉCTRICOS", cred:5 },
+                { sem:2, cod:"ELE204", nom:"ELECTRÓNICA ANALÓGICA", cred:5 }, { sem:2, cod:"ELE205", nom:"MEDICIONES ELECTRÓNICAS", cred:4 },
+                { sem:2, cod:"ELE206", nom:"PROGRAMACIÓN ORIENTADA A OBJETOS", cred:4 }
+            ]
+        },
+        "mecatronica": {
+            nombre: "INGENIERÍA EN MECATRÓNICA",
+            icono: "🤖",
+            totalCreditos: 260,
+            semestres: 9,
+            creditosPorSemestre: [32, 30, 34, 32, 30, 28, 30, 28, 16],
+            materias: [
+                { sem:1, cod:"MEC101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"MEC102", nom:"FÍSICA GENERAL", cred:5 },
+                { sem:1, cod:"MEC103", nom:"DIBUJO MECÁNICO", cred:5 }, { sem:1, cod:"MEC104", nom:"TALLER DE MECÁNICA", cred:5 },
+                { sem:1, cod:"MEC105", nom:"ELECTRICIDAD BÁSICA", cred:5 }, { sem:1, cod:"MEC106", nom:"QUÍMICA", cred:4 },
+                { sem:1, cod:"MEC107", nom:"ÉTICA", cred:3 }, { sem:2, cod:"MEC201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"MEC202", nom:"ÁLGEBRA LINEAL", cred:5 }, { sem:2, cod:"MEC203", nom:"ESTÁTICA", cred:5 },
+                { sem:2, cod:"MEC204", nom:"CIRCUITOS ELÉCTRICOS", cred:5 }, { sem:2, cod:"MEC205", nom:"PROGRAMACIÓN BÁSICA", cred:5 },
+                { sem:2, cod:"MEC206", nom:"DIBUJO ASISTIDO", cred:5 }
+            ]
+        },
+        "bioquimica": {
+            nombre: "INGENIERÍA BIOQUÍMICA",
+            icono: "🧬",
+            totalCreditos: 258,
+            semestres: 9,
+            creditosPorSemestre: [30, 28, 32, 30, 28, 28, 32, 28, 22],
+            materias: [
+                { sem:1, cod:"BIO101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"BIO102", nom:"QUÍMICA GENERAL", cred:5 },
+                { sem:1, cod:"BIO103", nom:"BIOLOGÍA CELULAR", cred:5 }, { sem:1, cod:"BIO104", nom:"FÍSICA GENERAL", cred:5 },
+                { sem:1, cod:"BIO105", nom:"DIBUJO TÉCNICO", cred:4 }, { sem:1, cod:"BIO106", nom:"ÉTICA", cred:3 },
+                { sem:1, cod:"BIO107", nom:"INTRODUCCIÓN A LA BIOQUÍMICA", cred:3 }, { sem:2, cod:"BIO201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"BIO202", nom:"QUÍMICA ORGÁNICA", cred:5 }, { sem:2, cod:"BIO203", nom:"BIOQUÍMICA", cred:5 },
+                { sem:2, cod:"BIO204", nom:"MICROBIOLOGÍA", cred:5 }, { sem:2, cod:"BIO205", nom:"TERMODINÁMICA", cred:5 },
+                { sem:2, cod:"BIO206", nom:"ESTADÍSTICA", cred:3 }
+            ]
+        },
+        "gestion": {
+            nombre: "INGENIERÍA EN GESTIÓN EMPRESARIAL",
+            icono: "📊",
+            totalCreditos: 245,
+            semestres: 9,
+            creditosPorSemestre: [28, 28, 28, 28, 28, 28, 28, 28, 21],
+            materias: [
+                { sem:1, cod:"GES101", nom:"MATEMÁTICAS ADMINISTRATIVAS", cred:5 }, { sem:1, cod:"GES102", nom:"INTRODUCCIÓN A LA GESTIÓN", cred:4 },
+                { sem:1, cod:"GES103", nom:"CONTABILIDAD BÁSICA", cred:5 }, { sem:1, cod:"GES104", nom:"ECONOMÍA", cred:4 },
+                { sem:1, cod:"GES105", nom:"ESTADÍSTICA", cred:5 }, { sem:1, cod:"GES106", nom:"ÉTICA EMPRESARIAL", cred:5 },
+                { sem:2, cod:"GES201", nom:"CÁLCULO DIFERENCIAL", cred:5 }, { sem:2, cod:"GES202", nom:"DERECHO LABORAL", cred:4 },
+                { sem:2, cod:"GES203", nom:"FINANZAS CORPORATIVAS", cred:5 }, { sem:2, cod:"GES204", nom:"MARKETING", cred:5 },
+                { sem:2, cod:"GES205", nom:"RECURSOS HUMANOS", cred:5 }, { sem:2, cod:"GES206", nom:"INFORMÁTICA", cred:4 }
+            ]
+        },
+        "industrial": {
+            nombre: "INGENIERÍA INDUSTRIAL",
+            icono: "🏭",
+            totalCreditos: 250,
+            semestres: 9,
+            creditosPorSemestre: [30, 28, 30, 28, 28, 28, 28, 28, 22],
+            materias: [
+                { sem:1, cod:"IND101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"IND102", nom:"DIBUJO INDUSTRIAL", cred:4 },
+                { sem:1, cod:"IND103", nom:"INTRODUCCIÓN A LA INGENIERÍA", cred:5 }, { sem:1, cod:"IND104", nom:"QUÍMICA", cred:4 },
+                { sem:1, cod:"IND105", nom:"ESTADÍSTICA", cred:5 }, { sem:1, cod:"IND106", nom:"ÉTICA", cred:4 },
+                { sem:1, cod:"IND107", nom:"ECONOMÍA", cred:3 }, { sem:2, cod:"IND201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"IND202", nom:"PROCESOS DE MANUFACTURA", cred:5 }, { sem:2, cod:"IND203", nom:"INVESTIGACIÓN DE OPERACIONES", cred:5 },
+                { sem:2, cod:"IND204", nom:"CONTABILIDAD", cred:5 }, { sem:2, cod:"IND205", nom:"ERGONOMÍA", cred:4 },
+                { sem:2, cod:"IND206", nom:"MATERIALES", cred:4 }
+            ]
+        },
+        "alimentarias": {
+            nombre: "INGENIERÍA EN ALIMENTARIAS",
+            icono: "🍎",
+            totalCreditos: 255,
+            semestres: 9,
+            creditosPorSemestre: [30, 28, 30, 28, 28, 28, 30, 28, 25],
+            materias: [
+                { sem:1, cod:"ALI101", nom:"MATEMÁTICAS BÁSICAS", cred:5 }, { sem:1, cod:"ALI102", nom:"QUÍMICA GENERAL", cred:5 },
+                { sem:1, cod:"ALI103", nom:"BIOLOGÍA", cred:5 }, { sem:1, cod:"ALI104", nom:"INTRODUCCIÓN A ALIMENTOS", cred:4 },
+                { sem:1, cod:"ALI105", nom:"FÍSICA GENERAL", cred:5 }, { sem:1, cod:"ALI106", nom:"ÉTICA", cred:3 },
+                { sem:1, cod:"ALI107", nom:"DIBUJO TÉCNICO", cred:3 }, { sem:2, cod:"ALI201", nom:"CÁLCULO DIFERENCIAL", cred:5 },
+                { sem:2, cod:"ALI202", nom:"QUÍMICA ORGÁNICA", cred:5 }, { sem:2, cod:"ALI203", nom:"BIOQUÍMICA", cred:5 },
+                { sem:2, cod:"ALI204", nom:"MICROBIOLOGÍA", cred:5 }, { sem:2, cod:"ALI205", nom:"FENÓMENOS DE TRANSPORTE", cred:4 },
+                { sem:2, cod:"ALI206", nom:"ESTADÍSTICA", cred:4 }
+            ]
+        },
+        "gastronomia": {
+            nombre: "GASTRONOMÍA",
+            icono: "🍳",
+            totalCreditos: 240,
+            semestres: 8,
+            creditosPorSemestre: [30, 30, 30, 30, 30, 30, 30, 30],
+            materias: [
+                { sem:1, cod:"GAS101", nom:"MATEMÁTICAS APLICADAS", cred:5 }, { sem:1, cod:"GAS102", nom:"INTRODUCCIÓN A LA GASTRONOMÍA", cred:5 },
+                { sem:1, cod:"GAS103", nom:"NUTRICIÓN", cred:5 }, { sem:1, cod:"GAS104", nom:"TALLER DE COCINA", cred:6 },
+                { sem:1, cod:"GAS105", nom:"HIGIENE Y SEGURIDAD", cred:4 }, { sem:1, cod:"GAS106", nom:"ADMINISTRACIÓN", cred:5 },
+                { sem:2, cod:"GAS201", nom:"COSTOS", cred:5 }, { sem:2, cod:"GAS202", nom:"COCINA MEXICANA", cred:6 },
+                { sem:2, cod:"GAS203", nom:"PANADERÍA", cred:5 }, { sem:2, cod:"GAS204", nom:"BROMATOLOGÍA", cred:5 },
+                { sem:2, cod:"GAS205", nom:"SERVICIO AL CLIENTE", cred:4 }, { sem:2, cod:"GAS206", nom:"MARKETING GASTRONÓMICO", cred:5 }
+            ]
+        }
+    };
+
+    // ==================== CONFIGURACIÓN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyBFf73N1kzPTUaSvgzzj3SpS1kzIBNJM8M",
         authDomain: "kardex-its-xalapa.firebaseapp.com",
@@ -335,141 +504,230 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Datos de materias (mismo que antes)
-    const TOTAL_CREDITOS = 260;
-    const CREDITOS_POR_SEMESTRE = [32, 30, 33, 32, 31, 29, 34, 29, 10];
-    
-    const materiasData = [
-        { sem:1, cod:"ACF0903", nom:"ÁLGEBRA LINEAL", cred:5 }, { sem:1, cod:"ACF0901", nom:"CÁLCULO DIFERENCIAL", cred:5 },
-        { sem:1, cod:"AEC1008", nom:"CONTABILIDAD FINANCIERA", cred:4 }, { sem:1, cod:"SCD1008", nom:"FUNDAMENTOS DE PROGRAMACIÓN", cred:5 },
-        { sem:1, cod:"AEF1041", nom:"MATEMÁTICAS DISCRETAS", cred:5 }, { sem:1, cod:"AEF1052", nom:"PROBABILIDAD Y ESTADÍSTICA", cred:5 },
-        { sem:1, cod:"SCH1024", nom:"TALLER DE ADMINISTRACIÓN", cred:4 }, { sem:2, cod:"ACF0902", nom:"CÁLCULO INTEGRAL", cred:5 },
-        { sem:2, cod:"ACD0908", nom:"DESARROLLO SUSTENTABLE", cred:5 }, { sem:2, cod:"SCF1006", nom:"FÍSICA GENERAL", cred:5 },
-        { sem:2, cod:"SCC1013", nom:"INVESTIGACIÓN DE OPERACIONES", cred:4 }, { sem:2, cod:"SCD1020", nom:"PROGRAMACIÓN ORIENTADA A OBJETOS", cred:5 },
-        { sem:2, cod:"AEC1058", nom:"QUÍMICA", cred:4 }, { sem:2, cod:"ACA0907", nom:"TALLER DE ÉTICA", cred:4 },
-        { sem:3, cod:"ACF0904", nom:"CÁLCULO VECTORIAL", cred:5 }, { sem:3, cod:"ACF0905", nom:"ECUACIONES DIFERENCIALES", cred:5 },
-        { sem:3, cod:"AED1026", nom:"ESTRUCTURA DE DATOS", cred:5 }, { sem:3, cod:"SCC1017", nom:"MÉTODOS NUMÉRICOS", cred:4 },
-        { sem:3, cod:"SCD1018", nom:"PRINCIPIOS ELÉCTRICOS", cred:5 }, { sem:3, cod:"SCD1022", nom:"SIMULACIÓN", cred:5 },
-        { sem:3, cod:"AEC1061", nom:"SISTEMAS OPERATIVOS", cred:4 }, { sem:4, cod:"SCC1003", nom:"ARQUITECTURA DE COMPUTADORAS", cred:5 },
-        { sem:4, cod:"AEF1031", nom:"FUNDAMENTOS DE BASE DE DATOS", cred:5 }, { sem:4, cod:"SCC1007", nom:"FUNDAMENTOS DE INGENIERÍA DE SOFTWARE", cred:4 },
-        { sem:4, cod:"AEC1034", nom:"FUNDAMENTOS DE TELECOMUNICACIONES", cred:4 }, { sem:4, cod:"SCD1015", nom:"LENGUAJES Y AUTÓMATAS I", cred:5 },
-        { sem:4, cod:"SCA1026", nom:"TALLER DE SISTEMAS OPERATIVOS", cred:4 }, { sem:4, cod:"SCD1027", nom:"TÓPICOS AVANZADOS DE PROGRAMACIÓN", cred:5 },
-        { sem:5, cod:"ACC0906", nom:"FUNDAMENTOS DE INVESTIGACIÓN", cred:4 }, { sem:5, cod:"SCC1010", nom:"GRÁFICACIÓN", cred:4 },
-        { sem:5, cod:"SCD1011", nom:"INGENIERÍA DE SOFTWARE", cred:5 }, { sem:5, cod:"SCC1012", nom:"INTELIGENCIA ARTIFICIAL", cred:4 },
-        { sem:5, cod:"SCD1016", nom:"LENGUAJES Y AUTÓMATAS II", cred:5 }, { sem:5, cod:"SCD1021", nom:"REDES DE COMPUTADORA", cred:5 },
-        { sem:5, cod:"SCA1025", nom:"TALLER DE BASE DE DATOS", cred:4 }, { sem:6, cod:"SCB1001", nom:"ADMINISTRACIÓN DE BASE DE DATOS", cred:5 },
-        { sem:6, cod:"SCC1005", nom:"CULTURA EMPRESARIAL", cred:4 }, { sem:6, cod:"SCC1014", nom:"LENGUAJES DE INTERFAZ", cred:4 },
-        { sem:6, cod:"SCC1019", nom:"PROGRAMACIÓN LÓGICA Y FUNCIONAL", cred:4 }, { sem:6, cod:"SCD1023", nom:"SISTEMAS PROGRAMABLES", cred:4 },
-        { sem:6, cod:"ACA0909", nom:"TALLER DE INVESTIGACIÓN I", cred:4 }, { sem:7, cod:"SCB1004", nom:"CONMUTACIÓN Y ENRUTAMIENTO", cred:5 },
-        { sem:7, cod:"SCC1001", nom:"SERVICIO SOCIAL", cred:10 }, { sem:7, cod:"AEB1055", nom:"PROGRAMACIÓN WEB", cred:5 },
-        { sem:7, cod:"ACA0910", nom:"TALLER DE INVESTIGACIÓN II", cred:4 }, { sem:7, cod:"SCG1009", nom:"GESTIÓN DE PROYECTOS", cred:6 },
-        { sem:8, cod:"SCA1002", nom:"ADMINISTRACIÓN DE REDES", cred:4 }, { sem:8, cod:"CNM-2404", nom:"ADMINISTRACIÓN DE CÓMPUTO EN LA NUBE", cred:6 },
-        { sem:8, cod:"CNG-2403", nom:"HERRAMIENTAS DE SOFTWARE EN LA NUBE", cred:7 }, { sem:8, cod:"CNG-2402", nom:"ARQUITECTURA DE SOLUCIONES EN LA NUBE", cred:6 },
-        { sem:8, cod:"CNG-2401", nom:"FUNDAMENTOS DE CÓMPUTO EN LA NUBE", cred:6 }, { sem:9, cod:"RPC1001", nom:"RESIDENCIA PROFESIONAL", cred:10 }
-    ];
-
     let currentUser = null;
-    let userData = { calificaciones: {}, estado: {}, perfil: {} };
+    let userData = { calificaciones: {}, estado: {}, perfil: { carrera: "sistemas" } };
+    let currentCarreraId = "sistemas";
+    let currentMaterias = [];
+    let totalCreditosCarrera = 260;
+    let creditosPorSemestre = [];
     let avanceChart = null;
 
-    // Funciones de autenticación y manejo de datos (igual que antes)
-    async function registrarUsuario(matricula, password) { /* ... */ }
-    async function iniciarSesion(matricula, password) { /* ... */ }
-    async function cerrarSesion() { /* ... */ }
-    async function cargarDatosUsuario() { /* ... */ }
-    async function guardarDatosUsuario() { /* ... */ }
+    // ==================== FUNCIONES DE CARRERA ====================
+    function cambiarCarrera(carreraId) {
+        currentCarreraId = carreraId;
+        const carrera = carrerasDB[carreraId];
+        if (carrera) {
+            currentMaterias = carrera.materias;
+            totalCreditosCarrera = carrera.totalCreditos;
+            creditosPorSemestre = carrera.creditosPorSemestre;
+            document.getElementById('carreraCreditosInfo').innerHTML = `${carrera.icono} ${totalCreditosCarrera} créditos totales`;
+            
+            // Actualizar el perfil del usuario
+            if (userData.perfil) {
+                userData.perfil.carrera = carreraId;
+                userData.perfil.carreraNombre = carrera.nombre;
+                guardarDatosUsuario();
+            }
+            
+            renderizarTodo();
+        }
+    }
+
+    function getMateriasCarrera() {
+        return currentMaterias;
+    }
+
+    function getCreditosPorSemestre() {
+        return creditosPorSemestre;
+    }
+
+    // ==================== FUNCIONES DE DATOS ====================
     function getEstado(cod) { return userData.estado?.[cod] || null; }
-    function setEstado(cod, estado) { /* ... */ }
     function getCalif(cod) { return userData.calificaciones?.[cod] || ''; }
-    function setCalif(cod, nota) { /* ... */ }
     
-    // Cálculos
+    function setEstado(cod, estado) {
+        if (!userData.estado) userData.estado = {};
+        if (estado === null) delete userData.estado[cod];
+        else userData.estado[cod] = estado;
+        guardarDatosUsuario();
+        renderizarTodo();
+    }
+    
+    function setCalif(cod, nota) {
+        if (!userData.calificaciones) userData.calificaciones = {};
+        if (nota === '' || nota === null) delete userData.calificaciones[cod];
+        else userData.calificaciones[cod] = parseInt(nota) || 0;
+        guardarDatosUsuario();
+        renderizarTodo();
+    }
+    
     function calcularCreditosCursados() {
         let creditos = 0;
-        materiasData.forEach(m => { if (getEstado(m.cod) === 'cursada') creditos += m.cred; });
+        getMateriasCarrera().forEach(m => { if (getEstado(m.cod) === 'cursada') creditos += m.cred; });
         return creditos;
     }
-    function calcularAvance() { return (calcularCreditosCursados() / TOTAL_CREDITOS) * 100; }
+    
+    function calcularAvance() { return (calcularCreditosCursados() / totalCreditosCarrera) * 100; }
+    
     function calcularPromedio() {
         let suma = 0, count = 0;
-        materiasData.forEach(m => {
+        getMateriasCarrera().forEach(m => {
             const nota = getCalif(m.cod);
             if (nota && nota > 0 && getEstado(m.cod) === 'cursada') { suma += nota; count++; }
         });
         return count > 0 ? (suma / count).toFixed(1) : 0;
     }
     
-    // Renderizado con Tailwind
+    function calcularPromedioPorSemestre(sem) {
+        const materiasSem = getMateriasCarrera().filter(m => m.sem === sem);
+        let suma = 0, count = 0;
+        materiasSem.forEach(m => {
+            const nota = getCalif(m.cod);
+            if (nota && nota > 0 && getEstado(m.cod) === 'cursada') { suma += nota; count++; }
+        });
+        return count > 0 ? (suma / count).toFixed(1) : 'N/A';
+    }
+    
+    // ==================== RENDERIZADO ====================
     function actualizarStatsUI() {
         const creditos = calcularCreditosCursados();
-        const avance = (creditos / TOTAL_CREDITOS * 100).toFixed(2);
+        const avance = (creditos / totalCreditosCarrera * 100).toFixed(2);
         const promedio = calcularPromedio();
-        const aprobadas = materiasData.filter(m => getEstado(m.cod) === 'cursada').length;
-        const reprobadas = materiasData.filter(m => {
+        const materias = getMateriasCarrera();
+        const aprobadas = materias.filter(m => getEstado(m.cod) === 'cursada').length;
+        const reprobadas = materias.filter(m => {
             const nota = getCalif(m.cod);
             return getEstado(m.cod) === 'cursada' && nota && nota < 60;
         }).length;
-        const cursando = materiasData.filter(m => getEstado(m.cod) === 'cursando').length;
-        const pendientes = materiasData.length - aprobadas;
+        const cursando = materias.filter(m => getEstado(m.cod) === 'cursando').length;
+        const pendientes = materias.length - aprobadas;
         
         document.getElementById('statsContainer').innerHTML = `
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${aprobadas}</p>
-                <p class="text-sm text-gray-500">Aprobadas</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-check-circle text-green-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${aprobadas}</p>
+                <p class="text-xs text-gray-500">Aprobadas</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-times-circle text-red-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${reprobadas}</p>
-                <p class="text-sm text-gray-500">Reprobadas</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-times-circle text-red-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${reprobadas}</p>
+                <p class="text-xs text-gray-500">Reprobadas</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-hourglass-half text-yellow-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${pendientes}</p>
-                <p class="text-sm text-gray-500">Te faltan</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-hourglass-half text-yellow-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${pendientes}</p>
+                <p class="text-xs text-gray-500">Te faltan</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-star text-purple-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${promedio}</p>
-                <p class="text-sm text-gray-500">Promedio</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-star text-purple-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${promedio}</p>
+                <p class="text-xs text-gray-500">Promedio</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-book-open text-blue-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${cursando}</p>
-                <p class="text-sm text-gray-500">En curso</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-book-open text-blue-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${cursando}</p>
+                <p class="text-xs text-gray-500">En curso</p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
-                <i class="fas fa-chart-line text-green-500 text-2xl mb-2"></i>
-                <p class="text-2xl font-bold text-gray-800 dark:text-white">${avance}%</p>
-                <p class="text-sm text-gray-500">Avance</p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-3 text-center hover:shadow-lg transition-smooth">
+                <i class="fas fa-chart-line text-green-500 text-xl mb-1"></i>
+                <p class="text-xl font-bold text-gray-800 dark:text-white">${avance}%</p>
+                <p class="text-xs text-gray-500">Avance</p>
             </div>
         `;
         
         document.getElementById('avancePorcentaje').innerHTML = `${avance}%`;
         document.getElementById('progressFill').style.width = `${avance}%`;
-        document.getElementById('avanceDetalle').innerHTML = `${creditos}/${TOTAL_CREDITOS} créditos acumulados`;
+        document.getElementById('avanceDetalle').innerHTML = `${creditos}/${totalCreditosCarrera} créditos`;
+        document.getElementById('promedioDisplay').innerHTML = `Promedio: ${promedio}`;
         
-        // Actualizar gráfica
         if (avanceChart) {
-            avanceChart.data.datasets[0].data = [creditos, TOTAL_CREDITOS - creditos];
+            avanceChart.data.datasets[0].data = [creditos, totalCreditosCarrera - creditos];
             avanceChart.update();
         }
     }
     
-    function renderizarMaterias() {
+    function renderizarEstadisticasPorSemestre() {
+        const container = document.getElementById('statsPorSemestre');
+        if (!container) return;
+        container.innerHTML = '';
+        const maxSemestre = getCreditosPorSemestre().length;
+        
+        for (let sem = 1; sem <= maxSemestre; sem++) {
+            const promedio = calcularPromedioPorSemestre(sem);
+            const materiasSem = getMateriasCarrera().filter(m => m.sem === sem);
+            const aprobadasSem = materiasSem.filter(m => getEstado(m.cod) === 'cursada').length;
+            const totalSem = materiasSem.length;
+            const creditosSem = materiasSem.reduce((sum, m) => sum + (getEstado(m.cod) === 'cursada' ? m.cred : 0), 0);
+            
+            container.innerHTML += `
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="font-semibold text-gray-700 dark:text-gray-200">Semestre ${sem}</span>
+                            <span class="text-xs text-gray-500 ml-2">${getCreditosPorSemestre()[sem-1]} créditos</span>
+                        </div>
+                        <span class="text-lg font-bold text-blue-600">${promedio}</span>
+                    </div>
+                    <div class="mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: ${(aprobadasSem/totalSem)*100}%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">${aprobadasSem}/${totalSem} materias aprobadas · ${creditosSem} créditos</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    function renderizarLogros() {
+        const container = document.getElementById('logrosContainer');
+        if (!container) return;
+        
+        const creditos = calcularCreditosCursados();
+        const promedio = parseFloat(calcularPromedio());
+        const aprobadas = getMateriasCarrera().filter(m => getEstado(m.cod) === 'cursada').length;
+        const totalMaterias = getMateriasCarrera().length;
+        const logros = [];
+        
+        if (creditos >= totalCreditosCarrera) logros.push({ icono: 'fa-crown', color: 'text-yellow-500', texto: '¡Completaste toda la carrera! 🎓' });
+        else if (creditos >= totalCreditosCarrera * 0.75) logros.push({ icono: 'fa-rocket', color: 'text-blue-500', texto: '75% completado - ¡Vas excelente!' });
+        else if (creditos >= totalCreditosCarrera * 0.5) logros.push({ icono: 'fa-chart-line', color: 'text-green-500', texto: '50% completado - Mitad de camino' });
+        
+        if (promedio >= 90) logros.push({ icono: 'fa-trophy', color: 'text-yellow-500', texto: 'Promedio de excelencia (90+)' });
+        else if (promedio >= 80) logros.push({ icono: 'fa-medal', color: 'text-blue-500', texto: 'Buen promedio (80+)' });
+        
+        if (aprobadas === totalMaterias) logros.push({ icono: 'fa-star', color: 'text-purple-500', texto: '¡Todas las materias aprobadas!' });
+        
+        if (logros.length === 0) {
+            logros.push({ icono: 'fa-seedling', color: 'text-green-500', texto: '¡Sigue así! Cada materia cuenta' });
+        }
+        
+        container.innerHTML = logros.map(l => `
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 flex items-center space-x-3">
+                <i class="fas ${l.icono} ${l.color} text-xl"></i>
+                <span class="text-sm text-gray-700 dark:text-gray-300">${l.texto}</span>
+            </div>
+        `).join('');
+    }
+    
+    function renderizarMaterias(busqueda = '') {
         const container = document.getElementById('semestresContainer');
         if (!container) return;
         container.innerHTML = '';
+        const maxSemestre = getCreditosPorSemestre().length;
         
-        for (let sem = 1; sem <= 9; sem++) {
-            const mats = materiasData.filter(m => m.sem === sem);
+        for (let sem = 1; sem <= maxSemestre; sem++) {
+            let mats = getMateriasCarrera().filter(m => m.sem === sem);
+            if (busqueda) {
+                mats = mats.filter(m => m.nom.toLowerCase().includes(busqueda.toLowerCase()) || m.cod.toLowerCase().includes(busqueda.toLowerCase()));
+            }
             if (mats.length === 0) continue;
             
             const semCard = document.createElement('div');
-            semCard.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-4 animate-slideIn';
+            semCard.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-4 animate-fadeIn';
             semCard.innerHTML = `
                 <div class="semestre-header p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 cursor-pointer flex justify-between items-center">
-                    <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-layer-group text-blue-600 mr-2"></i> Semestre ${sem} (${CREDITOS_POR_SEMESTRE[sem-1]} créditos)</h3>
+                    <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-layer-group text-blue-600 mr-2"></i> Semestre ${sem} (${getCreditosPorSemestre()[sem-1]} créditos)</h3>
                     <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
                 </div>
                 <div class="materias-container hidden p-4 space-y-3"></div>
@@ -480,23 +738,23 @@
                 const estado = getEstado(m.cod);
                 const nota = getCalif(m.cod);
                 const card = document.createElement('div');
-                card.className = `bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border-l-4 transition-all-slow ${estado === 'cursada' ? 'border-green-500' : estado === 'cursando' ? 'border-blue-500' : estado === 'proximo' ? 'border-orange-500' : 'border-gray-300'}`;
+                card.className = `bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border-l-4 transition-smooth ${estado === 'cursada' ? 'border-green-500' : estado === 'cursando' ? 'border-blue-500' : estado === 'proximo' ? 'border-orange-500' : 'border-gray-300'}`;
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="font-semibold text-gray-800 dark:text-white">${m.nom}</p>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-800 dark:text-white text-sm">${m.nom}</p>
                             <p class="text-xs text-gray-500">${m.cod} · ${m.cred} créditos</p>
                         </div>
-                        <input type="number" min="0" max="100" class="nota-input w-16 px-2 py-1 border rounded-lg text-center" data-cod="${m.cod}" value="${nota}" placeholder="-">
+                        <input type="number" min="0" max="100" class="nota-input w-20 px-2 py-1 border rounded-lg text-center text-sm" data-cod="${m.cod}" value="${nota}" placeholder="-">
                     </div>
-                    <div class="flex space-x-2">
-                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'cursada' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-green-100'}" data-cod="${m.cod}" data-estado="cursada">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-xs font-semibold transition-smooth ${estado === 'cursada' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-green-100'}" data-cod="${m.cod}" data-estado="cursada">
                             <i class="fas fa-check mr-1"></i> Cursada
                         </button>
-                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'cursando' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}" data-cod="${m.cod}" data-estado="cursando">
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-xs font-semibold transition-smooth ${estado === 'cursando' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}" data-cod="${m.cod}" data-estado="cursando">
                             <i class="fas fa-book mr-1"></i> Cursando
                         </button>
-                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'proximo' ? 'bg-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-orange-100'}" data-cod="${m.cod}" data-estado="proximo">
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-xs font-semibold transition-smooth ${estado === 'proximo' ? 'bg-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-orange-100'}" data-cod="${m.cod}" data-estado="proximo">
                             <i class="fas fa-calendar mr-1"></i> Próximo
                         </button>
                     </div>
@@ -521,6 +779,14 @@
         }));
     }
     
+    function renderizarTodo() {
+        actualizarStatsUI();
+        renderizarMaterias(document.getElementById('buscadorMaterias')?.value || '');
+        renderizarEstadisticasPorSemestre();
+        renderizarLogros();
+    }
+    
+    // ==================== GRÁFICA ====================
     function initGrafica() {
         const ctx = document.getElementById('avanceChart').getContext('2d');
         avanceChart = new Chart(ctx, {
@@ -528,27 +794,105 @@
             data: {
                 labels: ['Créditos cursados', 'Créditos restantes'],
                 datasets: [{
-                    data: [0, TOTAL_CREDITOS],
+                    data: [0, totalCreditosCarrera],
                     backgroundColor: ['#3b82f6', '#e2e8f0'],
-                    borderWidth: 0
+                    borderWidth: 0,
+                    borderRadius: 10
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    legend: { position: 'bottom' }
-                }
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+                    tooltip: { bodyFont: { size: 11 } }
+                },
+                cutout: '60%'
             }
         });
     }
     
-    function renderizarTodo() { actualizarStatsUI(); renderizarMaterias(); }
+    // ==================== FIREBASE ====================
+    async function guardarDatosUsuario() {
+        if (!currentUser) return;
+        await db.collection('kardex').doc(currentUser.uid).set(userData);
+    }
     
-    // Inicializar gráfica
-    initGrafica();
+    async function cargarDatosUsuario() {
+        if (!currentUser) return;
+        const doc = await db.collection('kardex').doc(currentUser.uid).get();
+        if (doc.exists) userData = doc.data();
+        else userData = { calificaciones: {}, estado: {}, perfil: { carrera: "sistemas" } };
+        if (!userData.perfil) userData.perfil = { carrera: "sistemas" };
+        
+        // Cargar la carrera del usuario
+        const carreraGuardada = userData.perfil.carrera || "sistemas";
+        document.getElementById('carreraSelector').value = carreraGuardada;
+        cambiarCarrera(carreraGuardada);
+        
+        document.getElementById('universidadInput').value = userData.perfil.universidad || 'Instituto Tecnológico Superior de Xalapa';
+        document.getElementById('codigoAlumno').value = userData.perfil.matricula || '';
+        document.getElementById('nombreAlumno').value = userData.perfil.nombre || '';
+        document.getElementById('especialidadInput').value = userData.perfil.especialidad || '';
+        document.getElementById('semestreActual').value = userData.perfil.semestreActual || '7';
+        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
+        renderizarTodo();
+    }
     
-    // Eventos de tabs
+    // ==================== AUTENTICACIÓN ====================
+    async function iniciarSesion(matricula, password) {
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Iniciando...';
+        try {
+            const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
+            currentUser = userCredential.user;
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            await cargarDatosUsuario();
+            renderizarTodo();
+        } catch (error) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.classList.remove('hidden');
+            errorDiv.innerHTML = error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión';
+        }
+    }
+    
+    async function registrarUsuario(matricula, password) {
+        const btn = document.getElementById('registerBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Registrando...';
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
+            currentUser = userCredential.user;
+            await db.collection('kardex').doc(currentUser.uid).set({
+                calificaciones: {}, estado: {}, perfil: { matricula, nombre: '', carrera: "sistemas", especialidad: '', semestreActual: '7', universidad: 'Instituto Tecnológico Superior de Xalapa' }
+            });
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            await cargarDatosUsuario();
+            renderizarTodo();
+        } catch (error) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.classList.remove('hidden');
+            errorDiv.innerHTML = error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Registrarse';
+        }
+    }
+    
+    async function cerrarSesion() {
+        await auth.signOut();
+        currentUser = null;
+        document.getElementById('loginContainer').classList.remove('hidden');
+        document.getElementById('appContainer').classList.add('hidden');
+    }
+    
+    // ==================== EVENTOS ====================
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'));
@@ -559,12 +903,45 @@
     });
     document.querySelector('.tab').click();
     
-    // Toggle tema
     document.getElementById('themeToggle').addEventListener('click', () => {
         document.body.classList.toggle('dark');
         localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     });
     if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    
+    document.getElementById('carreraSelector').addEventListener('change', (e) => {
+        cambiarCarrera(e.target.value);
+    });
+    
+    document.getElementById('buscadorMaterias')?.addEventListener('input', (e) => renderizarMaterias(e.target.value));
+    document.getElementById('guardarPerfilBtn').addEventListener('click', () => {
+        userData.perfil = {
+            universidad: document.getElementById('universidadInput').value,
+            matricula: document.getElementById('codigoAlumno').value,
+            nombre: document.getElementById('nombreAlumno').value,
+            carrera: currentCarreraId,
+            carreraNombre: carrerasDB[currentCarreraId].nombre,
+            especialidad: document.getElementById('especialidadInput').value,
+            semestreActual: document.getElementById('semestreActual').value
+        };
+        guardarDatosUsuario();
+        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
+        alert('Perfil guardado');
+    });
+    
+    document.getElementById('logoutBtn').addEventListener('click', cerrarSesion);
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const m = document.getElementById('loginMatricula').value.trim();
+        const p = document.getElementById('loginPassword').value;
+        if (m && p) iniciarSesion(m, p);
+        else alert('Completa todos los campos');
+    });
+    document.getElementById('registerBtn').addEventListener('click', () => {
+        const m = document.getElementById('loginMatricula').value.trim();
+        const p = document.getElementById('loginPassword').value;
+        if (m && p && p.length >= 6) registrarUsuario(m, p);
+        else alert(p.length < 6 ? 'Contraseña mínimo 6 caracteres' : 'Completa los campos');
+    });
     
     // OCR
     const uploadArea = document.getElementById('ocrUploadArea');
@@ -594,7 +971,8 @@
             const nums = text.match(/\b([0-9]{1,3})\b/g) || [];
             const califs = nums.filter(n => { let x = parseInt(n); return x >= 0 && x <= 100; }).map(Number);
             let idx = 0;
-            for (let m of materiasData) { if (idx < califs.length) { setCalif(m.cod, califs[idx]); if (califs[idx] >= 60) setEstado(m.cod, 'cursada'); idx++; } }
+            const materias = getMateriasCarrera();
+            for (let m of materias) { if (idx < califs.length) { setCalif(m.cod, califs[idx]); if (califs[idx] >= 60) setEstado(m.cod, 'cursada'); idx++; } }
             statusDiv.className = 'mt-4 p-3 bg-green-100 text-green-700 rounded-lg';
             statusDiv.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${califs.length} calificaciones asignadas`;
         } catch(e) { statusDiv.className = 'mt-4 p-3 bg-red-100 text-red-700 rounded-lg'; statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Error al analizar'; }
@@ -602,7 +980,7 @@
     
     // Exportar/Importar
     document.getElementById('exportarKardexBtn').addEventListener('click', () => {
-        const data = JSON.stringify({ calificaciones: userData.calificaciones, estado: userData.estado, perfil: userData.perfil });
+        const data = JSON.stringify({ calificaciones: userData.calificaciones, estado: userData.estado, perfil: userData.perfil, carrera: currentCarreraId });
         const blob = new Blob([data], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
@@ -619,6 +997,10 @@
             if (data.calificaciones) userData.calificaciones = data.calificaciones;
             if (data.estado) userData.estado = data.estado;
             if (data.perfil) userData.perfil = data.perfil;
+            if (data.carrera) {
+                document.getElementById('carreraSelector').value = data.carrera;
+                cambiarCarrera(data.carrera);
+            }
             guardarDatosUsuario();
             renderizarTodo();
         };
@@ -627,128 +1009,13 @@
     
     document.getElementById('eliminarDatosBtn').addEventListener('click', async () => {
         if (confirm('¿Eliminar TODOS tus datos? Esta acción es irreversible.')) {
-            userData = { calificaciones: {}, estado: {}, perfil: userData.perfil || {} };
+            userData = { calificaciones: {}, estado: {}, perfil: userData.perfil || { carrera: "sistemas" } };
             await guardarDatosUsuario();
             renderizarTodo();
         }
     });
     
-    document.getElementById('guardarPerfilBtn').addEventListener('click', () => {
-        userData.perfil = {
-            universidad: document.getElementById('universidadInput').value,
-            matricula: document.getElementById('codigoAlumno').value,
-            nombre: document.getElementById('nombreAlumno').value,
-            carrera: document.getElementById('carreraSelect').value,
-            especialidad: document.getElementById('especialidadInput').value,
-            semestreActual: document.getElementById('semestreActual').value
-        };
-        guardarDatosUsuario();
-        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
-        alert('Perfil guardado');
-    });
-    
-    document.getElementById('logoutBtn').addEventListener('click', cerrarSesion);
-    
-    // Funciones de autenticación
-    async function iniciarSesion(matricula, password) {
-        const btn = document.getElementById('loginBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Iniciando...';
-        try {
-            const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
-            currentUser = userCredential.user;
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            await cargarDatosUsuario();
-            renderizarTodo();
-        } catch (error) {
-            document.getElementById('loginError').classList.remove('hidden');
-            document.getElementById('loginError').innerHTML = error.message;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión';
-        }
-    }
-    
-    async function registrarUsuario(matricula, password) {
-        const btn = document.getElementById('registerBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Registrando...';
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
-            currentUser = userCredential.user;
-            await db.collection('kardex').doc(currentUser.uid).set({
-                calificaciones: {}, estado: {}, perfil: { matricula, nombre: '', carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES', especialidad: '', semestreActual: '7', universidad: 'Instituto Tecnológico Superior de Xalapa' }
-            });
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.getElementById('appContainer').classList.remove('hidden');
-            await cargarDatosUsuario();
-            renderizarTodo();
-        } catch (error) {
-            document.getElementById('loginError').classList.remove('hidden');
-            document.getElementById('loginError').innerHTML = error.message;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Registrarse';
-        }
-    }
-    
-    async function cerrarSesion() {
-        await auth.signOut();
-        currentUser = null;
-        document.getElementById('loginContainer').classList.remove('hidden');
-        document.getElementById('appContainer').classList.add('hidden');
-    }
-    
-    async function cargarDatosUsuario() {
-        if (!currentUser) return;
-        const doc = await db.collection('kardex').doc(currentUser.uid).get();
-        if (doc.exists) userData = doc.data();
-        else userData = { calificaciones: {}, estado: {}, perfil: {} };
-        if (!userData.perfil) userData.perfil = {};
-        document.getElementById('universidadInput').value = userData.perfil.universidad || '';
-        document.getElementById('codigoAlumno').value = userData.perfil.matricula || '';
-        document.getElementById('nombreAlumno').value = userData.perfil.nombre || '';
-        document.getElementById('carreraSelect').value = userData.perfil.carrera || 'INGENIERÍA EN SISTEMAS COMPUTACIONALES';
-        document.getElementById('especialidadInput').value = userData.perfil.especialidad || '';
-        document.getElementById('semestreActual').value = userData.perfil.semestreActual || '7';
-        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
-    }
-    
-    async function guardarDatosUsuario() {
-        if (!currentUser) return;
-        await db.collection('kardex').doc(currentUser.uid).set(userData);
-    }
-    
-    function setEstado(cod, estado) {
-        if (!userData.estado) userData.estado = {};
-        if (estado === null) delete userData.estado[cod];
-        else userData.estado[cod] = estado;
-        guardarDatosUsuario();
-        renderizarTodo();
-    }
-    
-    function setCalif(cod, nota) {
-        if (!userData.calificaciones) userData.calificaciones = {};
-        if (nota === '' || nota === null) delete userData.calificaciones[cod];
-        else userData.calificaciones[cod] = parseInt(nota) || 0;
-        guardarDatosUsuario();
-        renderizarTodo();
-    }
-    
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        const matricula = document.getElementById('loginMatricula').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (matricula && password) iniciarSesion(matricula, password);
-        else alert('Completa todos los campos');
-    });
-    
-    document.getElementById('registerBtn').addEventListener('click', () => {
-        const matricula = document.getElementById('loginMatricula').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (matricula && password && password.length >= 6) registrarUsuario(matricula, password);
-        else alert(password.length < 6 ? 'La contraseña debe tener al menos 6 caracteres' : 'Completa todos los campos');
-    });
+    initGrafica();
     
     auth.onAuthStateChanged(async (user) => {
         if (user) {

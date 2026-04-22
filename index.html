@@ -3,695 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ITS Xalapa - Sistema de Kardex</title>
-    <!-- Firebase SDKs -->
+    <title>ITS Xalapa - Kardex</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js para gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <!-- OCR -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        /* Animaciones personalizadas */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
-        /* Variables para modo claro/oscuro */
-        :root {
-            --fondo: #f5f7fa;
-            --card: #ffffff;
-            --texto: #1e293b;
-            --texto-claro: #64748b;
-            --borde: #e2e8f0;
-            --primario: #1e3c72;
-            --primario-light: #2c5282;
-            --verde: #10b981;
-            --naranja: #f59e0b;
-            --rojo: #ef4444;
-            --morado: #8b5cf6;
-            --login-bg: #f5f7fa;
-            --login-card-bg: #ffffff;
-            --login-text: #1e293b;
-            --login-text-light: #64748b;
-            --login-border: #e2e8f0;
-            --login-input-bg: #f8fafc;
-            --login-btn-bg: #1e3c72;
-            --login-btn-hover: #2c5282;
-            --login-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-
-        body.dark {
-            --fondo: #0f172a;
-            --card: #1e293b;
-            --texto: #f1f5f9;
-            --texto-claro: #94a3b8;
-            --borde: #334155;
-            --primario: #3b82f6;
-            --login-bg: #0f172a;
-            --login-card-bg: #1e293b;
-            --login-text: #f1f5f9;
-            --login-text-light: #94a3b8;
-            --login-border: #334155;
-            --login-input-bg: #334155;
-            --login-btn-bg: #3b82f6;
-            --login-btn-hover: #2563eb;
-            --login-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-
-        body {
-            background: var(--fondo);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: var(--texto);
-            min-height: 100vh;
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease-out;
         }
-
-        /* Pantalla de inicio de sesión */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--login-bg);
-            padding: 20px;
-            transition: background 0.3s ease;
+        
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
         }
-
-        .login-card {
-            background: var(--login-card-bg);
-            border-radius: 32px;
-            padding: 40px 32px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: var(--login-shadow);
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--login-border);
+        
+        .hover-pulse:hover {
+            animation: pulse 0.3s ease-in-out;
         }
-
-        .logo-container {
-            margin-bottom: 24px;
+        
+        /* Transiciones suaves */
+        .transition-all-slow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .logo-tecnm {
-            max-width: 200px;
-            margin: 0 auto;
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        .logo-tecnm img {
-            width: 100%;
-            height: auto;
-            max-height: 90px;
-            object-fit: contain;
-        }
-
-        .login-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--login-text);
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            font-size: 0.85rem;
-            color: var(--login-text-light);
-            margin-bottom: 32px;
-            border-bottom: 1px solid var(--login-border);
-            display: inline-block;
-            padding-bottom: 8px;
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid var(--login-border);
-            border-radius: 16px;
-            font-size: 0.95rem;
-            margin-bottom: 18px;
-            background: var(--login-input-bg);
-            color: var(--login-text);
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .login-input:focus {
-            border-color: var(--login-btn-bg);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--login-btn-bg);
-            color: white;
-            border: none;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 14px;
-            transition: all 0.2s;
-        }
-
-        .login-btn:hover {
-            background: var(--login-btn-hover);
-            transform: translateY(-1px);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .login-btn-secondary {
-            background: transparent;
-            color: var(--login-text);
-            border: 1px solid var(--login-border);
-        }
-
-        .login-btn-secondary:hover {
-            background: var(--login-border);
-        }
-
-        .login-footer {
-            font-size: 0.7rem;
-            color: var(--login-text-light);
-            margin-top: 28px;
-            padding-top: 16px;
-            border-top: 1px solid var(--login-border);
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 12px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .theme-switch-login {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--login-card-bg);
-            border: 1px solid var(--login-border);
-            padding: 10px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: var(--login-text);
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-        }
-
-        .theme-switch-login:hover {
-            transform: scale(1.05);
-        }
-
-        /* App principal */
-        .app-container {
-            display: none;
-            padding-bottom: 70px;
-        }
-
-        .header {
-            background: var(--card);
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--borde);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primario);
-        }
-
-        .user-info {
-            font-size: 0.7rem;
-            color: var(--texto-claro);
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            color: var(--texto);
-        }
-
-        .tabs {
-            display: flex;
-            background: var(--card);
-            border-bottom: 1px solid var(--borde);
-            position: sticky;
-            top: 70px;
-            z-index: 99;
-            overflow-x: auto;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--texto-claro);
-            background: none;
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .tab.active {
-            color: var(--primario);
-            border-bottom: 2px solid var(--primario);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 16px;
-            animation: fadeIn 0.3s;
-        }
-
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card-mobile {
-            background: var(--card);
-            border-radius: 16px;
-            padding: 12px 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .stat-card-mobile .emoji { font-size: 1.5rem; }
-        .stat-card-mobile .number { font-size: 1.4rem; font-weight: 800; }
-        .stat-card-mobile .label { font-size: 0.6rem; color: var(--texto-claro); }
-
-        .ocr-upload-area {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 2px dashed var(--borde);
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .preview-imagen {
-            margin-top: 12px;
-            border-radius: 16px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .preview-imagen img {
-            width: 100%;
-            max-height: 180px;
-            object-fit: cover;
-        }
-
-        .ocr-status {
-            margin-top: 12px;
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            display: none;
-        }
-
-        .ocr-status.success { background: rgba(16,185,129,0.1); color: var(--verde); display: block; }
-        .ocr-status.error { background: rgba(239,68,68,0.1); color: var(--rojo); display: block; }
-        .ocr-status.loading { background: rgba(59,130,246,0.1); color: var(--primario); display: block; }
-
-        .avance-reticular-card {
-            background: linear-gradient(135deg, var(--primario), var(--morado));
-            border-radius: 20px;
-            padding: 16px;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .progress-bar-big {
-            background: rgba(255,255,255,0.3);
-            border-radius: 20px;
-            height: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill-big {
-            background: white;
-            height: 100%;
-            width: 0%;
-            border-radius: 20px;
-        }
-
-        .profile-card, .backup-card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .profile-field {
-            margin-bottom: 14px;
-        }
-
-        .profile-field label {
-            display: block;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--texto-claro);
-            margin-bottom: 5px;
-        }
-
-        .profile-field input, .profile-field select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--borde);
-            border-radius: 12px;
-            background: var(--fondo);
-            color: var(--texto);
-            font-size: 0.85rem;
-        }
-
-        .btn-primario {
-            background: var(--primario);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        .btn-verde { background: var(--verde); }
-        .btn-naranja { background: var(--naranja); }
-        .btn-rojo { background: var(--rojo); }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .action-buttons button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .semestre-acordeon {
-            background: var(--card);
-            border-radius: 16px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .semestre-header {
-            padding: 14px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-
-        .materias-container {
-            display: none;
-            padding: 12px;
-            gap: 10px;
-            flex-direction: column;
-        }
-
-        .materias-container.open { display: flex; }
-
-        .materia-card-mobile {
-            background: var(--fondo);
-            border-radius: 14px;
-            padding: 10px;
-            border-left: 4px solid var(--texto-claro);
-        }
-
-        .materia-card-mobile.cursada { border-left-color: var(--verde); }
-        .materia-card-mobile.cursando { border-left-color: var(--primario); }
-        .materia-card-mobile.proximo { border-left-color: var(--naranja); }
-
-        .materia-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .materia-nombre { font-weight: 600; font-size: 0.8rem; }
-        .nota-mobile {
-            width: 60px;
-            padding: 6px;
+        
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
             border-radius: 10px;
-            border: 1px solid var(--borde);
-            text-align: center;
-            background: var(--card);
         }
-
-        .estado-btns {
-            display: flex;
-            gap: 6px;
+        
+        ::-webkit-scrollbar-thumb {
+            background: #1e3c72;
+            border-radius: 10px;
         }
-
-        .estado-btns button {
-            flex: 1;
-            padding: 5px;
-            border: none;
-            border-radius: 30px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            cursor: pointer;
-            opacity: 0.5;
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2c5282;
         }
-
-        .estado-btns button.active { opacity: 1; }
-        .btn-cursada-m { background: var(--verde); color: white; }
-        .btn-cursando-m { background: var(--primario); color: white; }
-        .btn-proximo-m { background: var(--naranja); color: white; }
-
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primario);
-            color: white;
-            width: 52px;
-            height: 52px;
-            border-radius: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            cursor: pointer;
-            z-index: 200;
+        
+        /* Modo oscuro personalizado con Tailwind */
+        .dark {
+            background-color: #0f172a;
+            color: #f1f5f9;
         }
-
-        .toast {
-            position: fixed;
-            bottom: 90px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            text-align: center;
-            padding: 12px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            z-index: 300;
-            animation: fadeOut 2.5s forwards;
+        
+        .dark .bg-white {
+            background-color: #1e293b !important;
         }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
+        
+        .dark .text-gray-600 {
+            color: #94a3b8 !important;
         }
-
-        .text-center { text-align: center; }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
+        
+        .dark .border-gray-200 {
+            border-color: #334155 !important;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .dark .bg-gray-50 {
+            background-color: #0f172a !important;
+        }
+        
+        .dark .bg-gray-100 {
+            background-color: #1e293b !important;
+        }
     </style>
 </head>
-<body>
-
-<!-- Switch de tema en login -->
-<button class="theme-switch-login" id="themeSwitchLogin">🌙 Modo oscuro</button>
+<body class="bg-gray-50 dark:bg-gray-900 transition-all-slow">
 
 <!-- Pantalla de Login -->
-<div id="loginContainer" class="login-container">
-    <div class="login-card">
-        <div class="logo-container">
-            <div class="logo-tecnm">
-                <img src="https://raw.githubusercontent.com/jousueperea-432bc/kardex/main/tecmm_logo.png" 
-                     alt="Tecnológico Nacional de México"
-                     style="width: 100%; height: auto;"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'font-size:1.2rem;font-weight:bold;\'>TECNOLÓGICO<br>NACIONAL DE MÉXICO</div>'">
+<div id="loginContainer" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full animate-fadeInUp">
+        <!-- Logo -->
+        <div class="text-center mb-6">
+            <div class="w-32 h-32 mx-auto bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-graduation-cap text-5xl text-white"></i>
             </div>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mt-4">TecNM</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Instituto Tecnológico Superior de Xalapa</p>
         </div>
         
-        <div class="login-title">Sistema de Kardex</div>
-        <div class="login-subtitle">Control académico</div>
+        <h3 class="text-xl font-semibold text-center text-gray-700 dark:text-gray-200 mb-2">Sistema de Kardex</h3>
+        <p class="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">Control académico</p>
         
-        <div id="loginError" class="error-message" style="display: none;"></div>
+        <div id="loginError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 hidden"></div>
         
-        <input type="text" id="loginMatricula" class="login-input" placeholder="Número de control" autocomplete="off">
-        <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
+        <input type="text" id="loginMatricula" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4" placeholder="Número de control">
+        <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4" placeholder="Contraseña">
         
-        <button id="loginBtn" class="login-btn">Iniciar sesión</button>
-        <button id="registerBtn" class="login-btn login-btn-secondary">Registrarse</button>
+        <button id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all-slow hover:shadow-lg">
+            <i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión
+        </button>
+        <button id="registerBtn" class="w-full mt-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 font-semibold py-3 rounded-lg transition-all-slow">
+            <i class="fas fa-user-plus mr-2"></i> Registrarse
+        </button>
         
-        <div class="login-footer">
-            © 2010-2026 ITS Xalapa<br>
-            Términos y condiciones de uso
-        </div>
+        <p class="text-center text-gray-400 text-xs mt-6">© 2010-2026 ITS Xalapa</p>
     </div>
 </div>
 
 <!-- App principal -->
-<div id="appContainer" class="app-container">
-    <div class="header">
-        <div>
-            <h1>📘 Mi Kardex</h1>
-            <div class="user-info" id="userInfoDisplay">Cargando...</div>
+<div id="appContainer" class="hidden">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-book-open text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">Mi Kardex</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400" id="userInfoDisplay">Cargando...</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all-slow">
+                    <i class="fas fa-moon text-gray-600 dark:text-gray-300 text-xl"></i>
+                </button>
+                <button id="logoutBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-sign-out-alt text-gray-600 dark:text-gray-300 text-xl"></i>
+                </button>
+            </div>
         </div>
-        <button class="icon-btn" id="themeToggleApp">🌙</button>
-    </div>
-
-    <div class="tabs">
-        <button class="tab active" data-tab="inicio">📊 Inicio</button>
-        <button class="tab" data-tab="materias">📚 Materias</button>
-        <button class="tab" data-tab="perfil">👤 Perfil</button>
-        <button class="tab" data-tab="backup">💾 Respaldo</button>
-        <button class="tab" id="logoutTab">🚪 Salir</button>
-    </div>
-
-    <div class="tab-content active" id="tab-inicio">
-        <div class="stats-grid" id="statsMobile"></div>
-
-        <div class="ocr-upload-area" id="ocrUploadArea">
-            <div style="font-size: 2rem;">📸</div>
-            <div style="font-weight: 500;">Sube un screenshot de tu kardex</div>
-            <div style="font-size: 0.7rem;">Toca o arrastra una imagen aquí</div>
-            <input type="file" id="imagenKardex" accept="image/*" style="display: none;">
-        </div>
-        <div class="preview-imagen" id="previewImagen">
-            <img id="previewImg" src="" alt="Vista previa">
-        </div>
-        <div id="ocrStatus" class="ocr-status"></div>
-
-        <div class="avance-reticular-card">
-            <div style="display: flex; justify-content: space-between;">
-                <span>🎯 Avance reticular</span>
-                <span id="avancePorcentaje">0%</span>
+    </header>
+    
+    <!-- Tabs -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm sticky top-[73px] z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex space-x-1 overflow-x-auto">
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="inicio">
+                    <i class="fas fa-chart-line mr-2"></i> Inicio
+                </button>
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="materias">
+                    <i class="fas fa-book mr-2"></i> Materias
+                </button>
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="perfil">
+                    <i class="fas fa-user mr-2"></i> Perfil
+                </button>
+                <button class="tab px-6 py-3 font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all-slow" data-tab="respaldo">
+                    <i class="fas fa-database mr-2"></i> Respaldo
+                </button>
             </div>
-            <div class="progress-bar-big">
-                <div class="progress-fill-big" id="progressFill"></div>
-            </div>
-            <div id="avanceDetalle">0/260 créditos acumulados</div>
-        </div>
-
-        <button class="btn-primario" id="analizarOCRBtn" style="background: var(--verde);">🔍 Analizar imagen con OCR</button>
-    </div>
-
-    <div class="tab-content" id="tab-materias">
-        <div id="semestresContainer"></div>
-    </div>
-
-    <div class="tab-content" id="tab-perfil">
-        <div class="profile-card">
-            <div class="profile-field">
-                <label>🏫 Universidad</label>
-                <input type="text" id="universidadInput" placeholder="Instituto Tecnológico Superior de Xalapa">
-            </div>
-            <div class="profile-field">
-                <label>🆓 Número de control</label>
-                <input type="text" id="codigoAlumno" placeholder="Ej: 217001299">
-            </div>
-            <div class="profile-field">
-                <label>👤 Nombre completo</label>
-                <input type="text" id="nombreAlumno" placeholder="Tu nombre">
-            </div>
-            <div class="profile-field">
-                <label>🎓 Carrera</label>
-                <select id="carreraSelect">
-                    <option>INGENIERÍA EN SISTEMAS COMPUTACIONALES</option>
-                    <option>INGENIERÍA INFORMÁTICA</option>
-                    <option>INGENIERÍA EN SOFTWARE</option>
-                    <option>INGENIERÍA EN REDES</option>
-                </select>
-            </div>
-            <div class="profile-field">
-                <label>⚡ Especialidad</label>
-                <input type="text" id="especialidadInput" placeholder="Ej: CÓMPUTO EN LA NUBE">
-            </div>
-            <div class="profile-field">
-                <label>📚 Semestre actual</label>
-                <input type="number" id="semestreActual" min="1" max="9" value="7">
-            </div>
-            <button id="guardarPerfilBtn" class="btn-primario">💾 Guardar perfil</button>
         </div>
     </div>
-
-    <div class="tab-content" id="tab-backup">
-        <div class="backup-card">
-            <div style="font-weight: bold; margin-bottom: 12px;">📤 Exportar mi kardex</div>
-            <button id="exportarKardexBtn" class="btn-primario btn-verde" style="background: var(--verde);">💾 Descargar respaldo (.json)</button>
-            <div style="margin: 15px 0; text-align: center; color: var(--texto-claro);">——— o ———</div>
-            <div style="font-weight: bold; margin-bottom: 12px;">📥 Importar kardex guardado</div>
-            <input type="file" id="importarArchivo" accept=".json" style="width:100%; padding:10px; border-radius:12px; background:var(--fondo); margin-bottom:10px;">
-            <button id="importarKardexBtn" class="btn-primario btn-naranja" style="background: var(--naranja);">📂 Cargar respaldo</button>
+    
+    <!-- Contenido -->
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Pestaña Inicio -->
+        <div class="tab-content hidden" id="tab-inicio">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6" id="statsContainer"></div>
+            
+            <!-- Gráfica de avance -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-chart-line text-blue-600 mr-2"></i> Progreso académico
+                </h3>
+                <canvas id="avanceChart" width="400" height="200" class="w-full h-64"></canvas>
+            </div>
+            
+            <!-- OCR Upload -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-camera mr-2 text-blue-600"></i> Sube tu kardex
+                </h3>
+                <div id="ocrUploadArea" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 transition-all-slow">
+                    <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Toca o arrastra una imagen aquí</p>
+                    <input type="file" id="imagenKardex" accept="image/*" class="hidden">
+                </div>
+                <div id="previewImagen" class="mt-4 hidden">
+                    <img id="previewImg" class="rounded-xl max-h-48 mx-auto">
+                </div>
+                <div id="ocrStatus" class="mt-4 hidden"></div>
+                <button id="analizarOCRBtn" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                    <i class="fas fa-search mr-2"></i> Analizar imagen
+                </button>
+            </div>
+            
+            <!-- Avance reticular -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-md p-6 text-white">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold"><i class="fas fa-chart-simple mr-2"></i> Avance reticular</span>
+                    <span class="text-2xl font-bold" id="avancePorcentaje">0%</span>
+                </div>
+                <div class="w-full bg-white/30 rounded-full h-3 mb-3">
+                    <div class="bg-white h-3 rounded-full transition-all duration-500" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p class="text-sm opacity-90" id="avanceDetalle">0/260 créditos acumulados</p>
+            </div>
         </div>
-        <div class="backup-card">
-            <div style="font-weight: bold; margin-bottom: 12px;">⚠️ Zona de peligro</div>
-            <button id="eliminarDatosBtn" class="btn-primario btn-rojo" style="background: var(--rojo);">🗑️ Eliminar todos mis datos</button>
+        
+        <!-- Pestaña Materias -->
+        <div class="tab-content hidden" id="tab-materias">
+            <div id="semestresContainer"></div>
+        </div>
+        
+        <!-- Pestaña Perfil -->
+        <div class="tab-content hidden" id="tab-perfil">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-id-card mr-2 text-blue-600"></i> Datos personales
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Universidad</label>
+                        <input type="text" id="universidadInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Instituto Tecnológico Superior de Xalapa">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de control</label>
+                        <input type="text" id="codigoAlumno" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre completo</label>
+                        <input type="text" id="nombreAlumno" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Carrera</label>
+                        <select id="carreraSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option>INGENIERÍA EN SISTEMAS COMPUTACIONALES</option>
+                            <option>INGENIERÍA INFORMÁTICA</option>
+                            <option>INGENIERÍA EN SOFTWARE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Especialidad</label>
+                        <input type="text" id="especialidadInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: CÓMPUTO EN LA NUBE">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semestre actual</label>
+                        <input type="number" id="semestreActual" min="1" max="9" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button id="guardarPerfilBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all-slow">
+                        <i class="fas fa-save mr-2"></i> Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pestaña Respaldo -->
+        <div class="tab-content hidden" id="tab-respaldo">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-4">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-download mr-2 text-green-600"></i> Exportar datos
+                </h3>
+                <button id="exportarKardexBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                    <i class="fas fa-file-export mr-2"></i> Descargar respaldo (.json)
+                </button>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-4">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-upload mr-2 text-orange-600"></i> Importar datos
+                </h3>
+                <input type="file" id="importarArchivo" accept=".json" class="w-full mb-3">
+                <button id="importarKardexBtn" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                    <i class="fas fa-file-import mr-2"></i> Cargar respaldo
+                </button>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                    <i class="fas fa-trash mr-2 text-red-600"></i> Zona de peligro
+                </h3>
+                <button id="eliminarDatosBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-all-slow">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Eliminar todos mis datos
+                </button>
+            </div>
         </div>
     </div>
 </div>
-
-<button class="fab" id="fabBtn">📚</button>
 
 <script>
     // Firebase Config
@@ -701,16 +328,15 @@
         projectId: "kardex-its-xalapa",
         storageBucket: "kardex-its-xalapa.firebasestorage.app",
         messagingSenderId: "326620659456",
-        appId: "1:326620659456:web:fe049bcfedb77b3d297de5",
-        measurementId: "G-CLDDHC0G55"
+        appId: "1:326620659456:web:fe049bcfedb77b3d297de5"
     };
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Datos de la carrera
-    const TOTAL_CREDITOS_CARRERA = 260;
+    // Datos de materias (mismo que antes)
+    const TOTAL_CREDITOS = 260;
     const CREDITOS_POR_SEMESTRE = [32, 30, 33, 32, 31, 29, 34, 29, 10];
     
     const materiasData = [
@@ -744,105 +370,270 @@
 
     let currentUser = null;
     let userData = { calificaciones: {}, estado: {}, perfil: {} };
+    let avanceChart = null;
 
-    // Funciones de autenticación
-    async function registrarUsuario(matricula, password) {
-        const btn = document.getElementById('registerBtn');
-        const errorDiv = document.getElementById('loginError');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spinner"></span> Registrando...';
-        errorDiv.style.display = 'none';
-        try {
-            const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
-            currentUser = userCredential.user;
-            await db.collection('kardex').doc(currentUser.uid).set({
-                calificaciones: {},
-                estado: {},
-                perfil: { matricula: matricula, nombre: '', carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES', especialidad: '', semestreActual: '7', universidad: 'Instituto Tecnológico Superior de Xalapa' },
-                createdAt: new Date()
-            });
-            mostrarToast('✅ Usuario registrado');
-            await cargarApp();
-        } catch (error) {
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = '❌ ' + error.message;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = 'Registrarse';
-        }
-    }
-
-    async function iniciarSesion(matricula, password) {
-        const btn = document.getElementById('loginBtn');
-        const errorDiv = document.getElementById('loginError');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spinner"></span> Iniciando...';
-        errorDiv.style.display = 'none';
-        try {
-            const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
-            currentUser = userCredential.user;
-            mostrarToast('👋 Bienvenido');
-            await cargarApp();
-        } catch (error) {
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = '❌ ' + error.message;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = 'Iniciar sesión';
-        }
-    }
-
-    async function cerrarSesion() {
-        await auth.signOut();
-        currentUser = null;
-        document.getElementById('loginContainer').style.display = 'flex';
-        document.getElementById('appContainer').style.display = 'none';
-    }
-
-    async function cargarDatosUsuario() {
-        if (!currentUser) return;
-        const doc = await db.collection('kardex').doc(currentUser.uid).get();
-        if (doc.exists) userData = doc.data();
-        else userData = { calificaciones: {}, estado: {}, perfil: {} };
-        if (!userData.perfil) userData.perfil = {};
-        cargarPerfilUI();
-        renderizarTodo();
-    }
-
-    async function guardarDatosUsuario() {
-        if (!currentUser) return;
-        await db.collection('kardex').doc(currentUser.uid).set(userData);
-    }
-
+    // Funciones de autenticación y manejo de datos (igual que antes)
+    async function registrarUsuario(matricula, password) { /* ... */ }
+    async function iniciarSesion(matricula, password) { /* ... */ }
+    async function cerrarSesion() { /* ... */ }
+    async function cargarDatosUsuario() { /* ... */ }
+    async function guardarDatosUsuario() { /* ... */ }
     function getEstado(cod) { return userData.estado?.[cod] || null; }
-    function setEstado(cod, estado) {
-        if (!userData.estado) userData.estado = {};
-        if (estado === null) delete userData.estado[cod];
-        else userData.estado[cod] = estado;
-        guardarDatosUsuario();
-        renderizarTodo();
-    }
+    function setEstado(cod, estado) { /* ... */ }
     function getCalif(cod) { return userData.calificaciones?.[cod] || ''; }
-    function setCalif(cod, nota) {
-        if (!userData.calificaciones) userData.calificaciones = {};
-        if (nota === '' || nota === null) delete userData.calificaciones[cod];
-        else userData.calificaciones[cod] = parseInt(nota) || 0;
-        guardarDatosUsuario();
-        renderizarTodo();
+    function setCalif(cod, nota) { /* ... */ }
+    
+    // Cálculos
+    function calcularCreditosCursados() {
+        let creditos = 0;
+        materiasData.forEach(m => { if (getEstado(m.cod) === 'cursada') creditos += m.cred; });
+        return creditos;
     }
-
-    function cargarPerfilUI() {
-        const p = userData.perfil || {};
-        document.getElementById('universidadInput').value = p.universidad || 'Instituto Tecnológico Superior de Xalapa';
-        document.getElementById('codigoAlumno').value = p.matricula || '';
-        document.getElementById('nombreAlumno').value = p.nombre || '';
-        document.getElementById('carreraSelect').value = p.carrera || 'INGENIERÍA EN SISTEMAS COMPUTACIONALES';
-        document.getElementById('especialidadInput').value = p.especialidad || '';
-        document.getElementById('semestreActual').value = p.semestreActual || '7';
-        document.getElementById('userInfoDisplay').innerHTML = `📚 ${p.nombre || p.matricula || 'Estudiante'}`;
+    function calcularAvance() { return (calcularCreditosCursados() / TOTAL_CREDITOS) * 100; }
+    function calcularPromedio() {
+        let suma = 0, count = 0;
+        materiasData.forEach(m => {
+            const nota = getCalif(m.cod);
+            if (nota && nota > 0 && getEstado(m.cod) === 'cursada') { suma += nota; count++; }
+        });
+        return count > 0 ? (suma / count).toFixed(1) : 0;
     }
-
-    function guardarPerfil() {
+    
+    // Renderizado con Tailwind
+    function actualizarStatsUI() {
+        const creditos = calcularCreditosCursados();
+        const avance = (creditos / TOTAL_CREDITOS * 100).toFixed(2);
+        const promedio = calcularPromedio();
+        const aprobadas = materiasData.filter(m => getEstado(m.cod) === 'cursada').length;
+        const reprobadas = materiasData.filter(m => {
+            const nota = getCalif(m.cod);
+            return getEstado(m.cod) === 'cursada' && nota && nota < 60;
+        }).length;
+        const cursando = materiasData.filter(m => getEstado(m.cod) === 'cursando').length;
+        const pendientes = materiasData.length - aprobadas;
+        
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${aprobadas}</p>
+                <p class="text-sm text-gray-500">Aprobadas</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-times-circle text-red-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${reprobadas}</p>
+                <p class="text-sm text-gray-500">Reprobadas</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-hourglass-half text-yellow-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${pendientes}</p>
+                <p class="text-sm text-gray-500">Te faltan</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-star text-purple-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${promedio}</p>
+                <p class="text-sm text-gray-500">Promedio</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-book-open text-blue-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${cursando}</p>
+                <p class="text-sm text-gray-500">En curso</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 text-center hover:shadow-lg transition-all-slow">
+                <i class="fas fa-chart-line text-green-500 text-2xl mb-2"></i>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">${avance}%</p>
+                <p class="text-sm text-gray-500">Avance</p>
+            </div>
+        `;
+        
+        document.getElementById('avancePorcentaje').innerHTML = `${avance}%`;
+        document.getElementById('progressFill').style.width = `${avance}%`;
+        document.getElementById('avanceDetalle').innerHTML = `${creditos}/${TOTAL_CREDITOS} créditos acumulados`;
+        
+        // Actualizar gráfica
+        if (avanceChart) {
+            avanceChart.data.datasets[0].data = [creditos, TOTAL_CREDITOS - creditos];
+            avanceChart.update();
+        }
+    }
+    
+    function renderizarMaterias() {
+        const container = document.getElementById('semestresContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        for (let sem = 1; sem <= 9; sem++) {
+            const mats = materiasData.filter(m => m.sem === sem);
+            if (mats.length === 0) continue;
+            
+            const semCard = document.createElement('div');
+            semCard.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-4 animate-slideIn';
+            semCard.innerHTML = `
+                <div class="semestre-header p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 cursor-pointer flex justify-between items-center">
+                    <h3 class="font-semibold text-gray-800 dark:text-white"><i class="fas fa-layer-group text-blue-600 mr-2"></i> Semestre ${sem} (${CREDITOS_POR_SEMESTRE[sem-1]} créditos)</h3>
+                    <i class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                </div>
+                <div class="materias-container hidden p-4 space-y-3"></div>
+            `;
+            
+            const materiasDiv = semCard.querySelector('.materias-container');
+            mats.forEach(m => {
+                const estado = getEstado(m.cod);
+                const nota = getCalif(m.cod);
+                const card = document.createElement('div');
+                card.className = `bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border-l-4 transition-all-slow ${estado === 'cursada' ? 'border-green-500' : estado === 'cursando' ? 'border-blue-500' : estado === 'proximo' ? 'border-orange-500' : 'border-gray-300'}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-white">${m.nom}</p>
+                            <p class="text-xs text-gray-500">${m.cod} · ${m.cred} créditos</p>
+                        </div>
+                        <input type="number" min="0" max="100" class="nota-input w-16 px-2 py-1 border rounded-lg text-center" data-cod="${m.cod}" value="${nota}" placeholder="-">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'cursada' ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-green-100'}" data-cod="${m.cod}" data-estado="cursada">
+                            <i class="fas fa-check mr-1"></i> Cursada
+                        </button>
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'cursando' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-blue-100'}" data-cod="${m.cod}" data-estado="cursando">
+                            <i class="fas fa-book mr-1"></i> Cursando
+                        </button>
+                        <button class="btn-estado flex-1 px-2 py-1 rounded-lg text-sm font-semibold transition-all-slow ${estado === 'proximo' ? 'bg-orange-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-orange-100'}" data-cod="${m.cod}" data-estado="proximo">
+                            <i class="fas fa-calendar mr-1"></i> Próximo
+                        </button>
+                    </div>
+                `;
+                materiasDiv.appendChild(card);
+            });
+            
+            container.appendChild(semCard);
+            const header = semCard.querySelector('.semestre-header');
+            const materiasContainer = semCard.querySelector('.materias-container');
+            const arrow = header.querySelector('.fa-chevron-down');
+            header.addEventListener('click', () => {
+                materiasContainer.classList.toggle('hidden');
+                arrow.style.transform = materiasContainer.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+        }
+        
+        document.querySelectorAll('.nota-input').forEach(inp => inp.addEventListener('change', (e) => setCalif(inp.dataset.cod, inp.value)));
+        document.querySelectorAll('.btn-estado').forEach(btn => btn.addEventListener('click', (e) => {
+            const cod = btn.dataset.cod, nuevo = btn.dataset.estado, actual = getEstado(cod);
+            setEstado(cod, actual === nuevo ? null : nuevo);
+        }));
+    }
+    
+    function initGrafica() {
+        const ctx = document.getElementById('avanceChart').getContext('2d');
+        avanceChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Créditos cursados', 'Créditos restantes'],
+                datasets: [{
+                    data: [0, TOTAL_CREDITOS],
+                    backgroundColor: ['#3b82f6', '#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+    
+    function renderizarTodo() { actualizarStatsUI(); renderizarMaterias(); }
+    
+    // Inicializar gráfica
+    initGrafica();
+    
+    // Eventos de tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600'));
+            tab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
+        });
+    });
+    document.querySelector('.tab').click();
+    
+    // Toggle tema
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    
+    // OCR
+    const uploadArea = document.getElementById('ocrUploadArea');
+    const fileInput = document.getElementById('imagenKardex');
+    const previewDiv = document.getElementById('previewImagen');
+    const previewImg = document.getElementById('previewImg');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', e => e.preventDefault());
+    uploadArea.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleImage(e.target.files[0]); });
+    
+    function handleImage(file) {
+        const reader = new FileReader();
+        reader.onload = ev => { previewImg.src = ev.target.result; previewDiv.classList.remove('hidden'); window.imagenActual = file; };
+        reader.readAsDataURL(file);
+    }
+    
+    document.getElementById('analizarOCRBtn').addEventListener('click', async () => {
+        const file = window.imagenActual || fileInput.files[0];
+        if (!file) { alert('Selecciona una imagen'); return; }
+        const statusDiv = document.getElementById('ocrStatus');
+        statusDiv.className = 'mt-4 p-3 bg-blue-100 text-blue-700 rounded-lg';
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Analizando...';
+        try {
+            const { data: { text } } = await Tesseract.recognize(file, 'spa+eng');
+            const nums = text.match(/\b([0-9]{1,3})\b/g) || [];
+            const califs = nums.filter(n => { let x = parseInt(n); return x >= 0 && x <= 100; }).map(Number);
+            let idx = 0;
+            for (let m of materiasData) { if (idx < califs.length) { setCalif(m.cod, califs[idx]); if (califs[idx] >= 60) setEstado(m.cod, 'cursada'); idx++; } }
+            statusDiv.className = 'mt-4 p-3 bg-green-100 text-green-700 rounded-lg';
+            statusDiv.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${califs.length} calificaciones asignadas`;
+        } catch(e) { statusDiv.className = 'mt-4 p-3 bg-red-100 text-red-700 rounded-lg'; statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Error al analizar'; }
+    });
+    
+    // Exportar/Importar
+    document.getElementById('exportarKardexBtn').addEventListener('click', () => {
+        const data = JSON.stringify({ calificaciones: userData.calificaciones, estado: userData.estado, perfil: userData.perfil });
+        const blob = new Blob([data], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `kardex_${Date.now()}.json`;
+        a.click();
+    });
+    
+    document.getElementById('importarKardexBtn').addEventListener('click', () => {
+        const file = document.getElementById('importarArchivo').files[0];
+        if (!file) { alert('Selecciona un archivo'); return; }
+        const reader = new FileReader();
+        reader.onload = e => {
+            const data = JSON.parse(e.target.result);
+            if (data.calificaciones) userData.calificaciones = data.calificaciones;
+            if (data.estado) userData.estado = data.estado;
+            if (data.perfil) userData.perfil = data.perfil;
+            guardarDatosUsuario();
+            renderizarTodo();
+        };
+        reader.readAsText(file);
+    });
+    
+    document.getElementById('eliminarDatosBtn').addEventListener('click', async () => {
+        if (confirm('¿Eliminar TODOS tus datos? Esta acción es irreversible.')) {
+            userData = { calificaciones: {}, estado: {}, perfil: userData.perfil || {} };
+            await guardarDatosUsuario();
+            renderizarTodo();
+        }
+    });
+    
+    document.getElementById('guardarPerfilBtn').addEventListener('click', () => {
         userData.perfil = {
             universidad: document.getElementById('universidadInput').value,
             matricula: document.getElementById('codigoAlumno').value,
@@ -852,206 +643,122 @@
             semestreActual: document.getElementById('semestreActual').value
         };
         guardarDatosUsuario();
-        mostrarToast('💾 Perfil guardado');
-    }
-
-    function calcularCreditosCursados() {
-        let creditos = 0;
-        materiasData.forEach(m => { if (getEstado(m.cod) === 'cursada') creditos += m.cred; });
-        return creditos;
-    }
-
-    function calcularAvance() { return (calcularCreditosCursados() / TOTAL_CREDITOS_CARRERA) * 100; }
-
-    function calcularPromedio() {
-        let suma = 0, count = 0;
-        materiasData.forEach(m => {
-            const nota = getCalif(m.cod);
-            if (nota && nota > 0 && getEstado(m.cod) === 'cursada') { suma += nota; count++; }
-        });
-        return count > 0 ? (suma / count).toFixed(1) : 0;
-    }
-
-    function calcularEstadisticas() {
-        let aprobadas = 0, reprobadas = 0, cursando = 0;
-        materiasData.forEach(m => {
-            const est = getEstado(m.cod);
-            const nota = getCalif(m.cod);
-            if (est === 'cursada') { aprobadas++; if (nota && nota < 60) reprobadas++; }
-            else if (est === 'cursando') cursando++;
-        });
-        return { aprobadas, reprobadas, cursando, pendientes: materiasData.length - aprobadas, promedio: calcularPromedio(), creditos: calcularCreditosCursados() };
-    }
-
-    function actualizarStatsUI() {
-        const s = calcularEstadisticas();
-        const avance = calcularAvance();
-        document.getElementById('statsMobile').innerHTML = `
-            <div class="stat-card-mobile"><div class="emoji">✅</div><div class="number">${s.aprobadas}</div><div class="label">Aprobadas</div></div>
-            <div class="stat-card-mobile"><div class="emoji">⚠️</div><div class="number">${s.reprobadas}</div><div class="label">Reprobadas</div></div>
-            <div class="stat-card-mobile"><div class="emoji">✨</div><div class="number">${s.pendientes}</div><div class="label">Te faltan</div></div>
-            <div class="stat-card-mobile"><div class="emoji">⭐</div><div class="number">${s.promedio}</div><div class="label">Promedio</div></div>
-            <div class="stat-card-mobile"><div class="emoji">📚</div><div class="number">${s.cursando}</div><div class="label">En curso</div></div>
-            <div class="stat-card-mobile"><div class="emoji">🎯</div><div class="number">${avance.toFixed(2)}%</div><div class="label">Avance</div></div>
-        `;
-        document.getElementById('avancePorcentaje').innerHTML = `${avance.toFixed(2)}%`;
-        document.getElementById('progressFill').style.width = `${avance}%`;
-        document.getElementById('avanceDetalle').innerHTML = `${s.creditos}/${TOTAL_CREDITOS_CARRERA} créditos`;
-    }
-
-    function renderizarMaterias() {
-        const container = document.getElementById('semestresContainer');
-        if (!container) return;
-        container.innerHTML = '';
-        for (let sem = 1; sem <= 9; sem++) {
-            const mats = materiasData.filter(m => m.sem === sem);
-            if (mats.length === 0) continue;
-            const acordeon = document.createElement('div');
-            acordeon.className = 'semestre-acordeon';
-            acordeon.innerHTML = `<div class="semestre-header"><span>📌 Semestre ${sem} (${CREDITOS_POR_SEMESTRE[sem-1]} créditos)</span><span>▼</span></div><div class="materias-container"></div>`;
-            const materiasDiv = acordeon.querySelector('.materias-container');
-            mats.forEach(m => {
-                const estado = getEstado(m.cod);
-                const nota = getCalif(m.cod);
-                const card = document.createElement('div');
-                card.className = `materia-card-mobile ${estado || ''}`;
-                if (estado === 'cursada') card.classList.add('cursada');
-                if (estado === 'cursando') card.classList.add('cursando');
-                if (estado === 'proximo') card.classList.add('proximo');
-                card.innerHTML = `
-                    <div class="materia-header">
-                        <div><div class="materia-nombre">${m.nom}</div><div style="font-size:0.6rem;">${m.cod} · ${m.cred} créditos</div></div>
-                        <input type="number" min="0" max="100" class="nota-mobile" data-cod="${m.cod}" value="${nota}" placeholder="-">
-                    </div>
-                    <div class="estado-btns">
-                        <button class="btn-cursada-m ${estado === 'cursada' ? 'active' : ''}" data-cod="${m.cod}" data-estado="cursada">✅</button>
-                        <button class="btn-cursando-m ${estado === 'cursando' ? 'active' : ''}" data-cod="${m.cod}" data-estado="cursando">📚</button>
-                        <button class="btn-proximo-m ${estado === 'proximo' ? 'active' : ''}" data-cod="${m.cod}" data-estado="proximo">📅</button>
-                    </div>
-                `;
-                materiasDiv.appendChild(card);
-            });
-            container.appendChild(acordeon);
-            const header = acordeon.querySelector('.semestre-header');
-            const materiasDivInner = acordeon.querySelector('.materias-container');
-            header.addEventListener('click', () => materiasDivInner.classList.toggle('open'));
-        }
-        document.querySelectorAll('.nota-mobile').forEach(inp => inp.addEventListener('change', (e) => setCalif(inp.dataset.cod, inp.value)));
-        document.querySelectorAll('.btn-cursada-m, .btn-cursando-m, .btn-proximo-m').forEach(btn => btn.addEventListener('click', (e) => {
-            const cod = btn.dataset.cod, nuevo = btn.dataset.estado, actual = getEstado(cod);
-            setEstado(cod, actual === nuevo ? null : nuevo);
-        }));
-    }
-
-    function renderizarTodo() { actualizarStatsUI(); renderizarMaterias(); }
-
-    // OCR
-    function setupOCRUpload() {
-        const area = document.getElementById('ocrUploadArea');
-        const fileInput = document.getElementById('imagenKardex');
-        const previewDiv = document.getElementById('previewImagen');
-        const previewImg = document.getElementById('previewImg');
-        area.addEventListener('click', () => fileInput.click());
-        area.addEventListener('dragover', e => e.preventDefault());
-        area.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
-        fileInput.addEventListener('change', e => { if (e.target.files[0]) handleImage(e.target.files[0]); });
-        function handleImage(file) { const reader = new FileReader(); reader.onload = ev => { previewImg.src = ev.target.result; previewDiv.style.display = 'block'; window.imagenActual = file; }; reader.readAsDataURL(file); }
-    }
-
-    async function analizarOCR() {
-        const file = window.imagenActual || document.getElementById('imagenKardex').files[0];
-        if (!file) { mostrarToast('Selecciona una imagen'); return; }
-        const status = document.getElementById('ocrStatus');
-        status.className = 'ocr-status loading';
-        status.innerHTML = '⏳ Analizando...';
+        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
+        alert('Perfil guardado');
+    });
+    
+    document.getElementById('logoutBtn').addEventListener('click', cerrarSesion);
+    
+    // Funciones de autenticación
+    async function iniciarSesion(matricula, password) {
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Iniciando...';
         try {
-            const { data: { text } } = await Tesseract.recognize(file, 'spa+eng');
-            const nums = text.match(/\b([0-9]{1,3})\b/g) || [];
-            const califs = nums.filter(n => { let x = parseInt(n); return x >= 0 && x <= 100; }).map(Number);
-            let idx = 0;
-            for (let m of materiasData) { if (idx < califs.length) { setCalif(m.cod, califs[idx]); if (califs[idx] >= 60) setEstado(m.cod, 'cursada'); idx++; } }
-            status.className = 'ocr-status success';
-            status.innerHTML = `✅ ${califs.length} calificaciones asignadas`;
-            mostrarToast(`🎉 ${califs.length} calificaciones`);
-        } catch(e) { status.className = 'ocr-status error'; status.innerHTML = `❌ Error`; }
-    }
-
-    function exportarKardex() {
-        const data = { calificaciones: userData.calificaciones, estado: userData.estado, perfil: userData.perfil };
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `kardex_${Date.now()}.json`;
-        a.click();
-        mostrarToast('📁 Respaldo descargado');
-    }
-
-    function importarKardex(file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (data.calificaciones) userData.calificaciones = data.calificaciones;
-                if (data.estado) userData.estado = data.estado;
-                if (data.perfil) userData.perfil = data.perfil;
-                guardarDatosUsuario();
-                renderizarTodo();
-                mostrarToast('✅ Importado');
-            } catch(err) { mostrarToast('Error'); }
-        };
-        reader.readAsText(file);
-    }
-
-    async function eliminarDatos() {
-        if (confirm('¿Eliminar TODOS tus datos?')) {
-            userData = { calificaciones: {}, estado: {}, perfil: userData.perfil || {} };
-            await guardarDatosUsuario();
+            const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
+            currentUser = userCredential.user;
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            await cargarDatosUsuario();
             renderizarTodo();
-            mostrarToast('🗑️ Datos eliminados');
+        } catch (error) {
+            document.getElementById('loginError').classList.remove('hidden');
+            document.getElementById('loginError').innerHTML = error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Iniciar sesión';
         }
     }
-
-    async function cargarApp() {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'block';
-        await cargarDatosUsuario();
+    
+    async function registrarUsuario(matricula, password) {
+        const btn = document.getElementById('registerBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Registrando...';
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
+            currentUser = userCredential.user;
+            await db.collection('kardex').doc(currentUser.uid).set({
+                calificaciones: {}, estado: {}, perfil: { matricula, nombre: '', carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES', especialidad: '', semestreActual: '7', universidad: 'Instituto Tecnológico Superior de Xalapa' }
+            });
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            await cargarDatosUsuario();
+            renderizarTodo();
+        } catch (error) {
+            document.getElementById('loginError').classList.remove('hidden');
+            document.getElementById('loginError').innerHTML = error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Registrarse';
+        }
+    }
+    
+    async function cerrarSesion() {
+        await auth.signOut();
+        currentUser = null;
+        document.getElementById('loginContainer').classList.remove('hidden');
+        document.getElementById('appContainer').classList.add('hidden');
+    }
+    
+    async function cargarDatosUsuario() {
+        if (!currentUser) return;
+        const doc = await db.collection('kardex').doc(currentUser.uid).get();
+        if (doc.exists) userData = doc.data();
+        else userData = { calificaciones: {}, estado: {}, perfil: {} };
+        if (!userData.perfil) userData.perfil = {};
+        document.getElementById('universidadInput').value = userData.perfil.universidad || '';
+        document.getElementById('codigoAlumno').value = userData.perfil.matricula || '';
+        document.getElementById('nombreAlumno').value = userData.perfil.nombre || '';
+        document.getElementById('carreraSelect').value = userData.perfil.carrera || 'INGENIERÍA EN SISTEMAS COMPUTACIONALES';
+        document.getElementById('especialidadInput').value = userData.perfil.especialidad || '';
+        document.getElementById('semestreActual').value = userData.perfil.semestreActual || '7';
+        document.getElementById('userInfoDisplay').innerHTML = `📚 ${userData.perfil.nombre || userData.perfil.matricula || 'Estudiante'}`;
+    }
+    
+    async function guardarDatosUsuario() {
+        if (!currentUser) return;
+        await db.collection('kardex').doc(currentUser.uid).set(userData);
+    }
+    
+    function setEstado(cod, estado) {
+        if (!userData.estado) userData.estado = {};
+        if (estado === null) delete userData.estado[cod];
+        else userData.estado[cod] = estado;
+        guardarDatosUsuario();
         renderizarTodo();
     }
-
-    // Tema
-    function initTheme() {
-        const saved = localStorage.getItem('kardex_theme');
-        if (saved === 'dark') { document.body.classList.add('dark'); document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro'; document.getElementById('themeToggleApp').innerHTML = '☀️'; }
-        else { document.body.classList.remove('dark'); document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro'; document.getElementById('themeToggleApp').innerHTML = '🌙'; }
+    
+    function setCalif(cod, nota) {
+        if (!userData.calificaciones) userData.calificaciones = {};
+        if (nota === '' || nota === null) delete userData.calificaciones[cod];
+        else userData.calificaciones[cod] = parseInt(nota) || 0;
+        guardarDatosUsuario();
+        renderizarTodo();
     }
-    function toggleTheme() {
-        if (document.body.classList.contains('dark')) { document.body.classList.remove('dark'); localStorage.setItem('kardex_theme', 'light'); document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro'; document.getElementById('themeToggleApp').innerHTML = '🌙'; }
-        else { document.body.classList.add('dark'); localStorage.setItem('kardex_theme', 'dark'); document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro'; document.getElementById('themeToggleApp').innerHTML = '☀️'; }
-    }
-    document.getElementById('themeSwitchLogin').addEventListener('click', toggleTheme);
-    if (document.getElementById('themeToggleApp')) document.getElementById('themeToggleApp').addEventListener('click', toggleTheme);
-    initTheme();
-
-    // Eventos
-    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
-    }));
-    document.getElementById('loginBtn').addEventListener('click', () => { const m = document.getElementById('loginMatricula').value.trim(); const p = document.getElementById('loginPassword').value; if (m && p) iniciarSesion(m, p); else mostrarToast('Completa los campos'); });
-    document.getElementById('registerBtn').addEventListener('click', () => { const m = document.getElementById('loginMatricula').value.trim(); const p = document.getElementById('loginPassword').value; if (m && p && p.length >= 6) registrarUsuario(m, p); else mostrarToast(p.length < 6 ? 'Contraseña mínimo 6 caracteres' : 'Completa los campos'); });
-    document.getElementById('logoutTab').addEventListener('click', cerrarSesion);
-    document.getElementById('guardarPerfilBtn').addEventListener('click', guardarPerfil);
-    document.getElementById('exportarKardexBtn').addEventListener('click', exportarKardex);
-    document.getElementById('importarKardexBtn').addEventListener('click', () => { const file = document.getElementById('importarArchivo').files[0]; if (file) importarKardex(file); else mostrarToast('Selecciona un archivo'); });
-    document.getElementById('eliminarDatosBtn').addEventListener('click', eliminarDatos);
-    document.getElementById('analizarOCRBtn').addEventListener('click', analizarOCR);
-    document.getElementById('fabBtn').addEventListener('click', () => document.querySelector('.tab[data-tab="materias"]').click());
-    setupOCRUpload();
-
-    auth.onAuthStateChanged(async (user) => { if (user) { currentUser = user; await cargarApp(); } else { document.getElementById('loginContainer').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; } });
-    function mostrarToast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
+    
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const matricula = document.getElementById('loginMatricula').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (matricula && password) iniciarSesion(matricula, password);
+        else alert('Completa todos los campos');
+    });
+    
+    document.getElementById('registerBtn').addEventListener('click', () => {
+        const matricula = document.getElementById('loginMatricula').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (matricula && password && password.length >= 6) registrarUsuario(matricula, password);
+        else alert(password.length < 6 ? 'La contraseña debe tener al menos 6 caracteres' : 'Completa todos los campos');
+    });
+    
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            await cargarDatosUsuario();
+            renderizarTodo();
+        }
+    });
 </script>
 </body>
 </html>

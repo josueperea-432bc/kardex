@@ -19,6 +19,17 @@
 
         /* Variables para modo claro/oscuro */
         :root {
+            --fondo: #f5f7fa;
+            --card: #ffffff;
+            --texto: #1e293b;
+            --texto-claro: #64748b;
+            --borde: #e2e8f0;
+            --primario: #1e3c72;
+            --primario-light: #2c5282;
+            --verde: #10b981;
+            --naranja: #f59e0b;
+            --rojo: #ef4444;
+            --morado: #8b5cf6;
             --login-bg: #f5f7fa;
             --login-card-bg: #ffffff;
             --login-text: #1e293b;
@@ -31,6 +42,12 @@
         }
 
         body.dark {
+            --fondo: #0f172a;
+            --card: #1e293b;
+            --texto: #f1f5f9;
+            --texto-claro: #94a3b8;
+            --borde: #334155;
+            --primario: #3b82f6;
             --login-bg: #0f172a;
             --login-card-bg: #1e293b;
             --login-text: #f1f5f9;
@@ -42,7 +59,14 @@
             --login-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Fondo del login (blanco/gris claro por defecto) */
+        body {
+            background: var(--fondo);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        /* Pantalla de inicio de sesión */
         .login-container {
             min-height: 100vh;
             display: flex;
@@ -53,7 +77,6 @@
             transition: background 0.3s ease;
         }
 
-        /* Tarjeta de login */
         .login-card {
             background: var(--login-card-bg);
             border-radius: 32px;
@@ -66,7 +89,6 @@
             border: 1px solid var(--login-border);
         }
 
-        /* Logo */
         .logo-container {
             margin-bottom: 24px;
         }
@@ -83,7 +105,6 @@
             object-fit: contain;
         }
 
-        /* Títulos */
         .login-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -100,7 +121,6 @@
             padding-bottom: 8px;
         }
 
-        /* Campos de entrada */
         .login-input {
             width: 100%;
             padding: 14px 18px;
@@ -116,15 +136,9 @@
 
         .login-input:focus {
             border-color: var(--login-btn-bg);
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
-        }
-
-        body.dark .login-input:focus {
-            border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* Botones */
         .login-btn {
             width: 100%;
             padding: 14px;
@@ -158,10 +172,8 @@
 
         .login-btn-secondary:hover {
             background: var(--login-border);
-            transform: translateY(-1px);
         }
 
-        /* Footer */
         .login-footer {
             font-size: 0.7rem;
             color: var(--login-text-light);
@@ -170,7 +182,6 @@
             border-top: 1px solid var(--login-border);
         }
 
-        /* Error message */
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -181,7 +192,6 @@
             text-align: left;
         }
 
-        /* Switch de tema en login */
         .theme-switch-login {
             position: fixed;
             top: 20px;
@@ -202,13 +212,12 @@
             transform: scale(1.05);
         }
 
-        /* App principal (se mantiene igual que antes) */
+        /* App principal */
         .app-container {
             display: none;
             padding-bottom: 70px;
         }
 
-        /* El resto de estilos de la app se mantienen igual */
         .header {
             background: var(--card);
             padding: 16px 20px;
@@ -554,7 +563,6 @@
 <!-- Pantalla de Login -->
 <div id="loginContainer" class="login-container">
     <div class="login-card">
-        <!-- Logo del TecNM -->
         <div class="logo-container">
             <div class="logo-tecnm">
                 <img src="https://raw.githubusercontent.com/jousueperea-432bc/kardex/main/tecmm_logo.png" 
@@ -582,7 +590,7 @@
     </div>
 </div>
 
-<!-- App principal (el resto del código se mantiene igual) -->
+<!-- App principal -->
 <div id="appContainer" class="app-container">
     <div class="header">
         <div>
@@ -600,7 +608,6 @@
         <button class="tab" id="logoutTab">🚪 Salir</button>
     </div>
 
-    <!-- Pestaña Inicio -->
     <div class="tab-content active" id="tab-inicio">
         <div class="stats-grid" id="statsMobile"></div>
 
@@ -629,12 +636,10 @@
         <button class="btn-primario" id="analizarOCRBtn" style="background: var(--verde);">🔍 Analizar imagen con OCR</button>
     </div>
 
-    <!-- Pestaña Materias -->
     <div class="tab-content" id="tab-materias">
         <div id="semestresContainer"></div>
     </div>
 
-    <!-- Pestaña Perfil -->
     <div class="tab-content" id="tab-perfil">
         <div class="profile-card">
             <div class="profile-field">
@@ -670,7 +675,6 @@
         </div>
     </div>
 
-    <!-- Pestaña Respaldo -->
     <div class="tab-content" id="tab-backup">
         <div class="backup-card">
             <div style="font-weight: bold; margin-bottom: 12px;">📤 Exportar mi kardex</div>
@@ -690,7 +694,7 @@
 <button class="fab" id="fabBtn">📚</button>
 
 <script>
-    // ==================== CONFIGURACIÓN DE FIREBASE ====================
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyBFf73N1kzPTUaSvgzzj3SpS1kzIBNJM8M",
         authDomain: "kardex-its-xalapa.firebaseapp.com",
@@ -705,7 +709,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ==================== DATOS DE LA CARRERA ====================
+    // Datos de la carrera
     const TOTAL_CREDITOS_CARRERA = 260;
     const CREDITOS_POR_SEMESTRE = [32, 30, 33, 32, 31, 29, 34, 29, 10];
     
@@ -738,89 +742,53 @@
         { sem:8, cod:"CNG-2401", nom:"FUNDAMENTOS DE CÓMPUTO EN LA NUBE", cred:6 }, { sem:9, cod:"RPC1001", nom:"RESIDENCIA PROFESIONAL", cred:10 }
     ];
 
-    // ==================== VARIABLES GLOBALES ====================
     let currentUser = null;
-    let userData = {
-        calificaciones: {},
-        estado: {},
-        perfil: {}
-    };
+    let userData = { calificaciones: {}, estado: {}, perfil: {} };
 
-    // ==================== FUNCIONES DE AUTENTICACIÓN ====================
+    // Funciones de autenticación
     async function registrarUsuario(matricula, password) {
-        const loginBtn = document.getElementById('registerBtn');
+        const btn = document.getElementById('registerBtn');
         const errorDiv = document.getElementById('loginError');
-        
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="loading-spinner"></span> Registrando...';
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Registrando...';
         errorDiv.style.display = 'none';
-        
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
             await db.collection('kardex').doc(currentUser.uid).set({
                 calificaciones: {},
                 estado: {},
-                perfil: {
-                    matricula: matricula,
-                    nombre: '',
-                    carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES',
-                    especialidad: '',
-                    semestreActual: '7',
-                    universidad: 'Instituto Tecnológico Superior de Xalapa'
-                },
+                perfil: { matricula: matricula, nombre: '', carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES', especialidad: '', semestreActual: '7', universidad: 'Instituto Tecnológico Superior de Xalapa' },
                 createdAt: new Date()
             });
-            mostrarToast('✅ Usuario registrado exitosamente');
+            mostrarToast('✅ Usuario registrado');
             await cargarApp();
         } catch (error) {
             errorDiv.style.display = 'block';
-            let mensaje = error.message;
-            if (error.code === 'auth/email-already-in-use') {
-                mensaje = '❌ Esta matrícula ya está registrada. Intenta iniciar sesión.';
-            } else if (error.code === 'auth/weak-password') {
-                mensaje = '❌ La contraseña debe tener al menos 6 caracteres.';
-            } else if (error.code === 'auth/operation-not-allowed') {
-                mensaje = '❌ Error de configuración. Contacta al administrador. (Auth no habilitado)';
-            }
-            errorDiv.innerHTML = mensaje;
-            mostrarToast(mensaje);
+            errorDiv.innerHTML = '❌ ' + error.message;
         } finally {
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = 'Registrarse';
+            btn.disabled = false;
+            btn.innerHTML = 'Registrarse';
         }
     }
 
     async function iniciarSesion(matricula, password) {
-        const loginBtn = document.getElementById('loginBtn');
+        const btn = document.getElementById('loginBtn');
         const errorDiv = document.getElementById('loginError');
-        
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<span class="loading-spinner"></span> Iniciando...';
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Iniciando...';
         errorDiv.style.display = 'none';
-        
         try {
             const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
-            mostrarToast('👋 Bienvenido ' + matricula);
+            mostrarToast('👋 Bienvenido');
             await cargarApp();
         } catch (error) {
             errorDiv.style.display = 'block';
-            let mensaje = error.message;
-            if (error.code === 'auth/user-not-found') {
-                mensaje = '❌ Usuario no encontrado. Regístrate primero.';
-            } else if (error.code === 'auth/wrong-password') {
-                mensaje = '❌ Contraseña incorrecta. Intenta de nuevo.';
-            } else if (error.code === 'auth/invalid-email') {
-                mensaje = '❌ Matrícula inválida.';
-            } else if (error.code === 'auth/operation-not-allowed') {
-                mensaje = '❌ Error de configuración. Contacta al administrador.';
-            }
-            errorDiv.innerHTML = mensaje;
-            mostrarToast(mensaje);
+            errorDiv.innerHTML = '❌ ' + error.message;
         } finally {
-            loginBtn.disabled = false;
-            loginBtn.innerHTML = 'Iniciar sesión';
+            btn.disabled = false;
+            btn.innerHTML = 'Iniciar sesión';
         }
     }
 
@@ -829,31 +797,13 @@
         currentUser = null;
         document.getElementById('loginContainer').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
-        document.getElementById('loginMatricula').value = '';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('loginError').style.display = 'none';
     }
 
-    // ==================== CARGAR DATOS DESDE FIRESTORE ====================
     async function cargarDatosUsuario() {
         if (!currentUser) return;
         const doc = await db.collection('kardex').doc(currentUser.uid).get();
-        if (doc.exists) {
-            userData = doc.data();
-        } else {
-            userData = {
-                calificaciones: {},
-                estado: {},
-                perfil: {
-                    matricula: currentUser.email?.split('@')[0] || '',
-                    nombre: '',
-                    carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES',
-                    especialidad: '',
-                    semestreActual: '7',
-                    universidad: 'Instituto Tecnológico Superior de Xalapa'
-                }
-            };
-        }
+        if (doc.exists) userData = doc.data();
+        else userData = { calificaciones: {}, estado: {}, perfil: {} };
         if (!userData.perfil) userData.perfil = {};
         cargarPerfilUI();
         renderizarTodo();
@@ -862,10 +812,8 @@
     async function guardarDatosUsuario() {
         if (!currentUser) return;
         await db.collection('kardex').doc(currentUser.uid).set(userData);
-        mostrarToast('💾 Datos guardados en la nube');
     }
 
-    // ==================== ACCESO A DATOS ====================
     function getEstado(cod) { return userData.estado?.[cod] || null; }
     function setEstado(cod, estado) {
         if (!userData.estado) userData.estado = {};
@@ -884,14 +832,14 @@
     }
 
     function cargarPerfilUI() {
-        const perfil = userData.perfil || {};
-        document.getElementById('universidadInput').value = perfil.universidad || 'Instituto Tecnológico Superior de Xalapa';
-        document.getElementById('codigoAlumno').value = perfil.matricula || '';
-        document.getElementById('nombreAlumno').value = perfil.nombre || '';
-        document.getElementById('carreraSelect').value = perfil.carrera || 'INGENIERÍA EN SISTEMAS COMPUTACIONALES';
-        document.getElementById('especialidadInput').value = perfil.especialidad || '';
-        document.getElementById('semestreActual').value = perfil.semestreActual || '7';
-        document.getElementById('userInfoDisplay').innerHTML = `📚 ${perfil.nombre || perfil.matricula || 'Estudiante'}`;
+        const p = userData.perfil || {};
+        document.getElementById('universidadInput').value = p.universidad || 'Instituto Tecnológico Superior de Xalapa';
+        document.getElementById('codigoAlumno').value = p.matricula || '';
+        document.getElementById('nombreAlumno').value = p.nombre || '';
+        document.getElementById('carreraSelect').value = p.carrera || 'INGENIERÍA EN SISTEMAS COMPUTACIONALES';
+        document.getElementById('especialidadInput').value = p.especialidad || '';
+        document.getElementById('semestreActual').value = p.semestreActual || '7';
+        document.getElementById('userInfoDisplay').innerHTML = `📚 ${p.nombre || p.matricula || 'Estudiante'}`;
     }
 
     function guardarPerfil() {
@@ -904,31 +852,22 @@
             semestreActual: document.getElementById('semestreActual').value
         };
         guardarDatosUsuario();
-        cargarPerfilUI();
-        mostrarToast('💾 Perfil guardado en la nube');
+        mostrarToast('💾 Perfil guardado');
     }
 
-    // ==================== CÁLCULOS ====================
     function calcularCreditosCursados() {
         let creditos = 0;
-        materiasData.forEach(m => {
-            if (getEstado(m.cod) === 'cursada') creditos += m.cred;
-        });
+        materiasData.forEach(m => { if (getEstado(m.cod) === 'cursada') creditos += m.cred; });
         return creditos;
     }
 
-    function calcularAvanceReticular() {
-        return (calcularCreditosCursados() / TOTAL_CREDITOS_CARRERA) * 100;
-    }
+    function calcularAvance() { return (calcularCreditosCursados() / TOTAL_CREDITOS_CARRERA) * 100; }
 
     function calcularPromedio() {
         let suma = 0, count = 0;
         materiasData.forEach(m => {
             const nota = getCalif(m.cod);
-            if (nota && nota > 0 && getEstado(m.cod) === 'cursada') {
-                suma += nota;
-                count++;
-            }
+            if (nota && nota > 0 && getEstado(m.cod) === 'cursada') { suma += nota; count++; }
         });
         return count > 0 ? (suma / count).toFixed(1) : 0;
     }
@@ -938,19 +877,15 @@
         materiasData.forEach(m => {
             const est = getEstado(m.cod);
             const nota = getCalif(m.cod);
-            if (est === 'cursada') {
-                aprobadas++;
-                if (nota && nota < 60) reprobadas++;
-            } else if (est === 'cursando') cursando++;
+            if (est === 'cursada') { aprobadas++; if (nota && nota < 60) reprobadas++; }
+            else if (est === 'cursando') cursando++;
         });
-        const pendientes = materiasData.length - aprobadas;
-        return { aprobadas, reprobadas, cursando, pendientes, promedio: calcularPromedio(), creditos: calcularCreditosCursados() };
+        return { aprobadas, reprobadas, cursando, pendientes: materiasData.length - aprobadas, promedio: calcularPromedio(), creditos: calcularCreditosCursados() };
     }
 
-    // ==================== RENDERIZADO ====================
     function actualizarStatsUI() {
         const s = calcularEstadisticas();
-        const avance = calcularAvanceReticular();
+        const avance = calcularAvance();
         document.getElementById('statsMobile').innerHTML = `
             <div class="stat-card-mobile"><div class="emoji">✅</div><div class="number">${s.aprobadas}</div><div class="label">Aprobadas</div></div>
             <div class="stat-card-mobile"><div class="emoji">⚠️</div><div class="number">${s.reprobadas}</div><div class="label">Reprobadas</div></div>
@@ -961,29 +896,20 @@
         `;
         document.getElementById('avancePorcentaje').innerHTML = `${avance.toFixed(2)}%`;
         document.getElementById('progressFill').style.width = `${avance}%`;
-        document.getElementById('avanceDetalle').innerHTML = `${s.creditos}/${TOTAL_CREDITOS_CARRERA} créditos acumulados`;
+        document.getElementById('avanceDetalle').innerHTML = `${s.creditos}/${TOTAL_CREDITOS_CARRERA} créditos`;
     }
 
     function renderizarMaterias() {
         const container = document.getElementById('semestresContainer');
         if (!container) return;
         container.innerHTML = '';
-        
         for (let sem = 1; sem <= 9; sem++) {
             const mats = materiasData.filter(m => m.sem === sem);
             if (mats.length === 0) continue;
-            
             const acordeon = document.createElement('div');
             acordeon.className = 'semestre-acordeon';
-            acordeon.innerHTML = `
-                <div class="semestre-header" data-sem="${sem}">
-                    <span>📌 Semestre ${sem} (${CREDITOS_POR_SEMESTRE[sem-1]} créditos)</span>
-                    <span>▼</span>
-                </div>
-                <div class="materias-container" id="sem-${sem}"></div>
-            `;
+            acordeon.innerHTML = `<div class="semestre-header"><span>📌 Semestre ${sem} (${CREDITOS_POR_SEMESTRE[sem-1]} créditos)</span><span>▼</span></div><div class="materias-container"></div>`;
             const materiasDiv = acordeon.querySelector('.materias-container');
-            
             mats.forEach(m => {
                 const estado = getEstado(m.cod);
                 const nota = getCalif(m.cod);
@@ -992,7 +918,6 @@
                 if (estado === 'cursada') card.classList.add('cursada');
                 if (estado === 'cursando') card.classList.add('cursando');
                 if (estado === 'proximo') card.classList.add('proximo');
-                
                 card.innerHTML = `
                     <div class="materia-header">
                         <div><div class="materia-nombre">${m.nom}</div><div style="font-size:0.6rem;">${m.cod} · ${m.cred} créditos</div></div>
@@ -1006,145 +931,86 @@
                 `;
                 materiasDiv.appendChild(card);
             });
-            
             container.appendChild(acordeon);
             const header = acordeon.querySelector('.semestre-header');
             const materiasDivInner = acordeon.querySelector('.materias-container');
-            header.addEventListener('click', () => {
-                materiasDivInner.classList.toggle('open');
-            });
+            header.addEventListener('click', () => materiasDivInner.classList.toggle('open'));
         }
-        
-        document.querySelectorAll('.nota-mobile').forEach(inp => {
-            inp.addEventListener('change', (e) => {
-                setCalif(inp.dataset.cod, inp.value);
-                actualizarStatsUI();
-            });
-        });
-        
-        document.querySelectorAll('.btn-cursada-m, .btn-cursando-m, .btn-proximo-m').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const cod = btn.dataset.cod;
-                const nuevo = btn.dataset.estado;
-                const actual = getEstado(cod);
-                setEstado(cod, actual === nuevo ? null : nuevo);
-                actualizarStatsUI();
-                renderizarMaterias();
-            });
-        });
+        document.querySelectorAll('.nota-mobile').forEach(inp => inp.addEventListener('change', (e) => setCalif(inp.dataset.cod, inp.value)));
+        document.querySelectorAll('.btn-cursada-m, .btn-cursando-m, .btn-proximo-m').forEach(btn => btn.addEventListener('click', (e) => {
+            const cod = btn.dataset.cod, nuevo = btn.dataset.estado, actual = getEstado(cod);
+            setEstado(cod, actual === nuevo ? null : nuevo);
+        }));
     }
 
-    function renderizarTodo() {
-        actualizarStatsUI();
-        renderizarMaterias();
-    }
+    function renderizarTodo() { actualizarStatsUI(); renderizarMaterias(); }
 
-    // ==================== OCR ====================
+    // OCR
     function setupOCRUpload() {
-        const uploadArea = document.getElementById('ocrUploadArea');
+        const area = document.getElementById('ocrUploadArea');
         const fileInput = document.getElementById('imagenKardex');
         const previewDiv = document.getElementById('previewImagen');
         const previewImg = document.getElementById('previewImg');
-        
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => e.preventDefault());
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) handleImage(file);
-        });
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) handleImage(e.target.files[0]);
-        });
-        
-        function handleImage(file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                previewImg.src = event.target.result;
-                previewDiv.style.display = 'block';
-                window.imagenActual = file;
-            };
-            reader.readAsDataURL(file);
-        }
+        area.addEventListener('click', () => fileInput.click());
+        area.addEventListener('dragover', e => e.preventDefault());
+        area.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', e => { if (e.target.files[0]) handleImage(e.target.files[0]); });
+        function handleImage(file) { const reader = new FileReader(); reader.onload = ev => { previewImg.src = ev.target.result; previewDiv.style.display = 'block'; window.imagenActual = file; }; reader.readAsDataURL(file); }
     }
 
     async function analizarOCR() {
         const file = window.imagenActual || document.getElementById('imagenKardex').files[0];
-        if (!file) { mostrarToast('Selecciona o arrastra una imagen primero'); return; }
-        
-        const statusDiv = document.getElementById('ocrStatus');
-        statusDiv.className = 'ocr-status loading';
-        statusDiv.innerHTML = '⏳ Analizando imagen con OCR...';
-        
+        if (!file) { mostrarToast('Selecciona una imagen'); return; }
+        const status = document.getElementById('ocrStatus');
+        status.className = 'ocr-status loading';
+        status.innerHTML = '⏳ Analizando...';
         try {
             const { data: { text } } = await Tesseract.recognize(file, 'spa+eng');
-            const numeros = text.match(/\b([0-9]{1,3})\b/g) || [];
-            const califs = numeros.filter(n => { let x = parseInt(n); return x >= 0 && x <= 100 && (x >= 50 || x === 0); }).map(Number);
-            
+            const nums = text.match(/\b([0-9]{1,3})\b/g) || [];
+            const califs = nums.filter(n => { let x = parseInt(n); return x >= 0 && x <= 100; }).map(Number);
             let idx = 0;
-            for (let m of materiasData) {
-                if (idx < califs.length) {
-                    setCalif(m.cod, califs[idx]);
-                    if (califs[idx] >= 60) setEstado(m.cod, 'cursada');
-                    idx++;
-                }
-                if (idx >= califs.length) break;
-            }
-            
-            statusDiv.className = 'ocr-status success';
-            statusDiv.innerHTML = `✅ ${califs.length} calificaciones asignadas. Revisa y corrige.`;
-            mostrarToast(`🎉 ${califs.length} calificaciones cargadas`);
-        } catch(e) {
-            statusDiv.className = 'ocr-status error';
-            statusDiv.innerHTML = `❌ Error: ${e.message}`;
-        }
+            for (let m of materiasData) { if (idx < califs.length) { setCalif(m.cod, califs[idx]); if (califs[idx] >= 60) setEstado(m.cod, 'cursada'); idx++; } }
+            status.className = 'ocr-status success';
+            status.innerHTML = `✅ ${califs.length} calificaciones asignadas`;
+            mostrarToast(`🎉 ${califs.length} calificaciones`);
+        } catch(e) { status.className = 'ocr-status error'; status.innerHTML = `❌ Error`; }
     }
 
-    // ==================== RESPALDO LOCAL ====================
     function exportarKardex() {
-        const data = {
-            calificaciones: userData.calificaciones,
-            estado: userData.estado,
-            perfil: userData.perfil,
-            fechaExportacion: new Date().toISOString()
-        };
+        const data = { calificaciones: userData.calificaciones, estado: userData.estado, perfil: userData.perfil };
         const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `kardex_${userData.perfil?.matricula || 'backup'}_${Date.now()}.json`;
+        a.download = `kardex_${Date.now()}.json`;
         a.click();
         mostrarToast('📁 Respaldo descargado');
     }
 
     function importarKardex(file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
             try {
                 const data = JSON.parse(e.target.result);
                 if (data.calificaciones) userData.calificaciones = data.calificaciones;
                 if (data.estado) userData.estado = data.estado;
                 if (data.perfil) userData.perfil = data.perfil;
                 guardarDatosUsuario();
-                cargarPerfilUI();
                 renderizarTodo();
-                mostrarToast('✅ Respaldo importado y guardado en la nube');
-            } catch(err) {
-                mostrarToast('Error al leer el archivo');
-            }
+                mostrarToast('✅ Importado');
+            } catch(err) { mostrarToast('Error'); }
         };
         reader.readAsText(file);
     }
 
-    async function eliminarTodosLosDatos() {
-        if (confirm('¿Eliminar TODOS tus datos? Esta acción es irreversible.')) {
+    async function eliminarDatos() {
+        if (confirm('¿Eliminar TODOS tus datos?')) {
             userData = { calificaciones: {}, estado: {}, perfil: userData.perfil || {} };
             await guardarDatosUsuario();
             renderizarTodo();
-            mostrarToast('🗑️ Todos tus datos han sido eliminados');
+            mostrarToast('🗑️ Datos eliminados');
         }
     }
 
-    // ==================== CARGAR APP ====================
     async function cargarApp() {
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('appContainer').style.display = 'block';
@@ -1152,100 +1018,40 @@
         renderizarTodo();
     }
 
-    // ==================== TEMA (CLARO/OSCURO) ====================
+    // Tema
     function initTheme() {
         const saved = localStorage.getItem('kardex_theme');
-        if (saved === 'dark') {
-            document.body.classList.add('dark');
-            document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro';
-            document.getElementById('themeToggleApp').innerHTML = '☀️';
-        } else {
-            document.body.classList.remove('dark');
-            document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro';
-            document.getElementById('themeToggleApp').innerHTML = '🌙';
-        }
+        if (saved === 'dark') { document.body.classList.add('dark'); document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro'; document.getElementById('themeToggleApp').innerHTML = '☀️'; }
+        else { document.body.classList.remove('dark'); document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro'; document.getElementById('themeToggleApp').innerHTML = '🌙'; }
     }
-
     function toggleTheme() {
-        if (document.body.classList.contains('dark')) {
-            document.body.classList.remove('dark');
-            localStorage.setItem('kardex_theme', 'light');
-            document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro';
-            if (document.getElementById('themeToggleApp')) {
-                document.getElementById('themeToggleApp').innerHTML = '🌙';
-            }
-        } else {
-            document.body.classList.add('dark');
-            localStorage.setItem('kardex_theme', 'dark');
-            document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro';
-            if (document.getElementById('themeToggleApp')) {
-                document.getElementById('themeToggleApp').innerHTML = '☀️';
-            }
-        }
+        if (document.body.classList.contains('dark')) { document.body.classList.remove('dark'); localStorage.setItem('kardex_theme', 'light'); document.getElementById('themeSwitchLogin').innerHTML = '🌙 Modo oscuro'; document.getElementById('themeToggleApp').innerHTML = '🌙'; }
+        else { document.body.classList.add('dark'); localStorage.setItem('kardex_theme', 'dark'); document.getElementById('themeSwitchLogin').innerHTML = '☀️ Modo claro'; document.getElementById('themeToggleApp').innerHTML = '☀️'; }
     }
-
     document.getElementById('themeSwitchLogin').addEventListener('click', toggleTheme);
-    if (document.getElementById('themeToggleApp')) {
-        document.getElementById('themeToggleApp').addEventListener('click', toggleTheme);
-    }
+    if (document.getElementById('themeToggleApp')) document.getElementById('themeToggleApp').addEventListener('click', toggleTheme);
     initTheme();
 
-    // ==================== EVENTOS ====================
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
-        });
-    });
-
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        const matricula = document.getElementById('loginMatricula').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (matricula && password) iniciarSesion(matricula, password);
-        else mostrarToast('Ingresa matrícula y contraseña');
-    });
-    document.getElementById('registerBtn').addEventListener('click', () => {
-        const matricula = document.getElementById('loginMatricula').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (matricula && password && password.length >= 6) registrarUsuario(matricula, password);
-        else if (password.length < 6) mostrarToast('La contraseña debe tener al menos 6 caracteres');
-        else mostrarToast('Ingresa matrícula y contraseña');
-    });
+    // Eventos
+    document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+    }));
+    document.getElementById('loginBtn').addEventListener('click', () => { const m = document.getElementById('loginMatricula').value.trim(); const p = document.getElementById('loginPassword').value; if (m && p) iniciarSesion(m, p); else mostrarToast('Completa los campos'); });
+    document.getElementById('registerBtn').addEventListener('click', () => { const m = document.getElementById('loginMatricula').value.trim(); const p = document.getElementById('loginPassword').value; if (m && p && p.length >= 6) registrarUsuario(m, p); else mostrarToast(p.length < 6 ? 'Contraseña mínimo 6 caracteres' : 'Completa los campos'); });
     document.getElementById('logoutTab').addEventListener('click', cerrarSesion);
     document.getElementById('guardarPerfilBtn').addEventListener('click', guardarPerfil);
     document.getElementById('exportarKardexBtn').addEventListener('click', exportarKardex);
-    document.getElementById('importarKardexBtn').addEventListener('click', () => {
-        const file = document.getElementById('importarArchivo').files[0];
-        if (file) importarKardex(file);
-        else mostrarToast('Selecciona un archivo .json');
-    });
-    document.getElementById('eliminarDatosBtn').addEventListener('click', eliminarTodosLosDatos);
+    document.getElementById('importarKardexBtn').addEventListener('click', () => { const file = document.getElementById('importarArchivo').files[0]; if (file) importarKardex(file); else mostrarToast('Selecciona un archivo'); });
+    document.getElementById('eliminarDatosBtn').addEventListener('click', eliminarDatos);
     document.getElementById('analizarOCRBtn').addEventListener('click', analizarOCR);
-    document.getElementById('fabBtn').addEventListener('click', () => {
-        document.querySelector('.tab[data-tab="materias"]').click();
-    });
-
+    document.getElementById('fabBtn').addEventListener('click', () => document.querySelector('.tab[data-tab="materias"]').click());
     setupOCRUpload();
 
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUser = user;
-            await cargarApp();
-        } else {
-            document.getElementById('loginContainer').style.display = 'flex';
-            document.getElementById('appContainer').style.display = 'none';
-        }
-    });
-
-    function mostrarToast(mensaje) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = mensaje;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
-    }
+    auth.onAuthStateChanged(async (user) => { if (user) { currentUser = user; await cargarApp(); } else { document.getElementById('loginContainer').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; } });
+    function mostrarToast(m) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
 </script>
 </body>
 </html>

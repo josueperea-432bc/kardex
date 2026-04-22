@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ITS Xalapa - Sistema de Kardex</title>
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (versión compat para CDN) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -138,7 +138,7 @@
             margin-top: 24px;
         }
 
-        /* App principal (oculta hasta login) */
+        /* App principal */
         .app-container {
             display: none;
             padding-bottom: 70px;
@@ -184,6 +184,7 @@
             position: sticky;
             top: 70px;
             z-index: 99;
+            overflow-x: auto;
         }
 
         .tab {
@@ -196,6 +197,7 @@
             background: none;
             border: none;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .tab.active {
@@ -467,6 +469,16 @@
         }
 
         .text-center { text-align: center; }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -478,7 +490,7 @@
         <div class="login-title">Instituto Tecnológico Superior de Xalapa</div>
         <div class="login-subtitle">Sistema de Kardex</div>
         
-        <input type="text" id="loginMatricula" class="login-input" placeholder="Número de control" value="">
+        <input type="text" id="loginMatricula" class="login-input" placeholder="Número de control" autocomplete="off">
         <input type="password" id="loginPassword" class="login-input" placeholder="Contraseña">
         
         <button id="loginBtn" class="login-btn">Iniciar sesión</button>
@@ -491,7 +503,7 @@
     </div>
 </div>
 
-<!-- App principal (oculta hasta login) -->
+<!-- App principal -->
 <div id="appContainer" class="app-container">
     <div class="header">
         <div>
@@ -600,15 +612,14 @@
 
 <script>
     // ==================== CONFIGURACIÓN DE FIREBASE ====================
-    // 🔴 ¡IMPORTANTE! Reemplaza con tus propias credenciales de Firebase
-    // Ve a: https://console.firebase.google.com/ → Crear proyecto → Agregar app web
     const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "TU_AUTH_DOMAIN",
-        projectId: "TU_PROJECT_ID",
-        storageBucket: "TU_STORAGE_BUCKET",
-        messagingSenderId: "TU_MESSAGING_SENDER_ID",
-        appId: "TU_APP_ID"
+        apiKey: "AIzaSyBFf73N1kzPTUaSvgzzj3SpS1kzIBNJM8M",
+        authDomain: "kardex-its-xalapa.firebaseapp.com",
+        projectId: "kardex-its-xalapa",
+        storageBucket: "kardex-its-xalapa.firebasestorage.app",
+        messagingSenderId: "326620659456",
+        appId: "1:326620659456:web:fe049bcfedb77b3d297de5",
+        measurementId: "G-CLDDHC0G55"
     };
 
     // Inicializar Firebase
@@ -662,7 +673,6 @@
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
-            // Crear documento en Firestore
             await db.collection('kardex').doc(currentUser.uid).set({
                 calificaciones: {},
                 estado: {},
@@ -671,12 +681,13 @@
                     nombre: '',
                     carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES',
                     especialidad: '',
-                    semestreActual: '7'
+                    semestreActual: '7',
+                    universidad: 'Instituto Tecnológico Superior de Xalapa'
                 },
                 createdAt: new Date()
             });
             mostrarToast('✅ Usuario registrado exitosamente');
-            cargarApp();
+            await cargarApp();
         } catch (error) {
             mostrarToast('❌ Error: ' + error.message);
         }
@@ -687,7 +698,7 @@
             const userCredential = await auth.signInWithEmailAndPassword(matricula + "@itsxalapa.edu.mx", password);
             currentUser = userCredential.user;
             mostrarToast('👋 Bienvenido ' + matricula);
-            cargarApp();
+            await cargarApp();
         } catch (error) {
             mostrarToast('❌ Error: ' + error.message);
         }
@@ -717,10 +728,12 @@
                     nombre: '',
                     carrera: 'INGENIERÍA EN SISTEMAS COMPUTACIONALES',
                     especialidad: '',
-                    semestreActual: '7'
+                    semestreActual: '7',
+                    universidad: 'Instituto Tecnológico Superior de Xalapa'
                 }
             };
         }
+        if (!userData.perfil) userData.perfil = {};
         cargarPerfilUI();
         renderizarTodo();
     }
@@ -732,15 +745,17 @@
     }
 
     // ==================== ACCESO A DATOS ====================
-    function getEstado(cod) { return userData.estado[cod] || null; }
+    function getEstado(cod) { return userData.estado?.[cod] || null; }
     function setEstado(cod, estado) {
+        if (!userData.estado) userData.estado = {};
         if (estado === null) delete userData.estado[cod];
         else userData.estado[cod] = estado;
         guardarDatosUsuario();
         renderizarTodo();
     }
-    function getCalif(cod) { return userData.calificaciones[cod] || ''; }
+    function getCalif(cod) { return userData.calificaciones?.[cod] || ''; }
     function setCalif(cod, nota) {
+        if (!userData.calificaciones) userData.calificaciones = {};
         if (nota === '' || nota === null) delete userData.calificaciones[cod];
         else userData.calificaciones[cod] = parseInt(nota) || 0;
         guardarDatosUsuario();
@@ -938,7 +953,7 @@
         
         const statusDiv = document.getElementById('ocrStatus');
         statusDiv.className = 'ocr-status loading';
-        statusDiv.innerHTML = '⏳ Analizando imagen...';
+        statusDiv.innerHTML = '⏳ Analizando imagen con OCR...';
         
         try {
             const { data: { text } } = await Tesseract.recognize(file, 'spa+eng');
